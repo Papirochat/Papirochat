@@ -158,7 +158,10 @@ body.papel  .card-item{border-color:#eee;color:#111;}
 
   <div id="form-login">
     <input class="inp" id="li-user" placeholder="∆tunombre°" autocomplete="off" spellcheck="false"><br><br>
-    <input class="inp" id="li-pass" type="password" placeholder="contraseña">
+    <div style="width:100%;max-width:300px;position:relative;margin:0 auto;">
+      <input class="inp" id="li-pass" type="password" placeholder="contraseña" style="padding-right:40px;">
+      <span onclick="toggleOjo('li-pass','ojo3')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo3">👁</span>
+    </div>
     <div style="height:8px;"></div>
     <button class="btn" onclick="iniciarSesion()">ENTRAR ∆°</button>
     <div class="err-txt" id="login-err"></div>
@@ -167,9 +170,28 @@ body.papel  .card-item{border-color:#eee;color:#111;}
 
   <div id="form-registro" style="display:none;flex-direction:column;align-items:center;gap:10px;">
     <input class="inp" id="rg-user" placeholder="elige tu nombre (sin @, sin espacios)" autocomplete="off" spellcheck="false">
-    <input class="inp" id="rg-pass" type="password" placeholder="crea una contraseña (mín 6)">
+
+    <div style="width:100%;max-width:300px;position:relative;">
+      <input class="inp" id="rg-pass" type="password" placeholder="crea una contraseña (mín 6)" style="padding-right:40px;">
+      <span onclick="toggleOjo('rg-pass','ojo1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo1">👁</span>
+    </div>
+    <div style="width:100%;max-width:300px;position:relative;">
+      <input class="inp" id="rg-pass2" type="password" placeholder="repite la contraseña" style="padding-right:40px;">
+      <span onclick="toggleOjo('rg-pass2','ojo2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo2">👁</span>
+    </div>
+
+    <div style="width:100%;max-width:300px;text-align:left;font-size:9px;opacity:.5;letter-spacing:1px;">TODO LO SIGUIENTE ES OPCIONAL:</div>
+
+    <div style="display:flex;align-items:center;gap:10px;width:100%;max-width:300px;">
+      <img id="rg-img-preview" style="width:44px;height:44px;border-radius:50%;object-fit:cover;background:rgba(128,128,128,.2);flex-shrink:0;">
+      <label class="btn secundario" style="width:auto;padding:8px 12px;font-size:10px;margin:0;text-align:center;cursor:pointer;">
+        FOTO DE PERFIL
+        <input type="file" id="rg-img-input" accept="image/*" style="display:none;" onchange="previsualizarImagen()">
+      </label>
+    </div>
+
     <input class="inp" id="rg-referido" placeholder="¿quién te invitó? ∆nombre° (opcional)">
-    <textarea class="inp" id="rg-filo" rows="3" maxlength="777" placeholder="tu filosofía o frase (máx 777 caracteres)" oninput="contarFilo()"></textarea>
+    <textarea class="inp" id="rg-filo" rows="3" maxlength="777" placeholder="tu filosofía o frase (opcional, máx 777 caracteres)" oninput="contarFilo()"></textarea>
     <div class="char-count"><span id="filo-count">0</span>/777</div>
     <input class="inp" id="rg-bitchat" placeholder="tu código Bitchat (opcional)">
     <input class="inp" id="rg-briar" placeholder="tu código Briar (opcional)">
@@ -341,10 +363,33 @@ function mostrarRegistro(){ document.getElementById('form-login').style.display=
 function mostrarLogin(){ document.getElementById('form-registro').style.display='none'; document.getElementById('form-login').style.display='block'; }
 function contarFilo(){ document.getElementById('filo-count').textContent = document.getElementById('rg-filo').value.length; }
 
-/* ── REGISTRO ── */
+function toggleOjo(inputId, ojoId){
+  var inp = document.getElementById(inputId);
+  var ojo = document.getElementById(ojoId);
+  if(inp.type==='password'){ inp.type='text'; ojo.style.opacity=1; }
+  else{ inp.type='password'; ojo.style.opacity=.6; }
+}
+
+var IMG_BASE64 = '';
+function previsualizarImagen(){
+  var file = document.getElementById('rg-img-input').files[0];
+  if(!file) return;
+  if(file.size > 900*1024){ alert('La imagen es muy pesada. Usa una de menos de 900KB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    IMG_BASE64 = e.target.result;
+    document.getElementById('rg-img-preview').src = IMG_BASE64;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── REGISTRO ──
+   Único requisito real: nombre disponible + contraseña confirmada igual.
+   Todo lo demás (foto, filosofía, bitchat, briar, referido) es opcional. */
 async function registrar(){
   var nombre = document.getElementById('rg-user').value.trim();
   var pass = document.getElementById('rg-pass').value;
+  var pass2 = document.getElementById('rg-pass2').value;
   var referido = document.getElementById('rg-referido').value.trim();
   var filo = document.getElementById('rg-filo').value.trim();
   var bitchat = document.getElementById('rg-bitchat').value.trim();
@@ -353,6 +398,7 @@ async function registrar(){
 
   if(!/^∆.+°$/.test(nombre)){ err.textContent='El nombre debe llevar ∆ al inicio y ° al final. Ej: ∆tunombre°'; return; }
   if(pass.length<6){ err.textContent='Contraseña mínimo 6 caracteres'; return; }
+  if(pass!==pass2){ err.textContent='Las dos contraseñas no coinciden'; return; }
   if(filo.length>777){ err.textContent='La filosofía no puede pasar de 777 caracteres'; return; }
   err.textContent='Creando cuenta...';
 
@@ -361,7 +407,10 @@ async function registrar(){
 
   try{
     var {error} = await sb.from('pc_usuarios').insert({
-      nombre:nombre, pass_hash:passHash, filosofia:filo,
+      nombre:nombre, pass_hash:passHash,
+      imagen_url: IMG_BASE64||null,
+      filosofia: filo||null,
+      filosofia_editada_en: filo ? new Date().toISOString() : null,
       bitchat_id:bitchat||null, briar_id:briar||null,
       referido_por: referido||null, rol:rol
     });
@@ -620,8 +669,28 @@ async function verPerfil(nombre){
       '<div class="profile-filo">'+(data.filosofia?escHtml(data.filosofia):'<i>Sin filosofía escrita.</i>')+'</div>' +
       '<div class="profile-codes">'+codigosHtml+'</div>' +
       (nombre!==U.nombre ? '<button class="btn secundario" style="margin-top:10px;" onclick="cerrarOverlay(\'perfil-overlay\');abrirDM(\''+nombre.replace(/'/g,"\\'")+'\')">✉ Enviar mensaje</button>' : '') +
-      (nombre!==U.nombre ? '<button class="btn secundario" style="margin-top:8px;" onclick="agregarContacto(\''+nombre.replace(/'/g,"\\'")+'\')">＋ Agregar a mi agenda</button>' : '');
+      (nombre!==U.nombre ? '<button class="btn secundario" style="margin-top:8px;" onclick="agregarContacto(\''+nombre.replace(/'/g,"\\'")+'\')">＋ Agregar a mi agenda</button>' : '') +
+      (nombre===U.nombre ? '<button class="btn secundario" style="margin-top:8px;" onclick="editarFilosofia(\''+(data.filosofia_editada_en||'')+'\')">✎ Editar mi filosofía</button>' : '');
   }catch(x){ cont.innerHTML='Error al cargar el perfil'; }
+}
+
+/* ── EDITAR FILOSOFÍA (máx una vez cada 24h) ── */
+async function editarFilosofia(ultimaEdicionISO){
+  if(ultimaEdicionISO){
+    var horasPasadas = (Date.now() - new Date(ultimaEdicionISO).getTime()) / 3600000;
+    if(horasPasadas < 24){
+      alert('Ya editaste tu filosofía hace poco. Podrás cambiarla de nuevo en '+Math.ceil(24-horasPasadas)+' horas.');
+      return;
+    }
+  }
+  var nueva = prompt('Nueva filosofía (máx 777 caracteres):');
+  if(nueva===null) return;
+  nueva = nueva.trim().slice(0,777);
+  try{
+    await sb.from('pc_usuarios').update({ filosofia:nueva||null, filosofia_editada_en:new Date().toISOString() }).eq('nombre',U.nombre);
+    alert('Filosofía actualizada.');
+    verPerfil(U.nombre);
+  }catch(x){ alert('Error al actualizar'); }
 }
 
 /* ── AGENDA (máx 70, borra uno para meter otro) ── */
