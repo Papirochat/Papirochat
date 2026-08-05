@@ -795,11 +795,21 @@ async function limpiarNotificacionesExpiradas(){
 
 /* ── ENVIAR MENSAJE DE SALA ── */
 var enviando = false;
+var ultimoTextoEnviado = '';
+var ultimoTextoEnviadoSeg = 0;
 async function enviar(){
   if(enviando) return; // evita doble-envío por doble-toque en móvil
   var inp = document.getElementById('msg-input');
   var txt = inp.value.trim();
   if(!txt) return;
+
+  // Red de seguridad extra: si el mismo texto exacto se intenta enviar de
+  // nuevo dentro de los 4 segundos siguientes, se bloquea. Esto cubre casos
+  // donde el candado normal no alcanzó a activarse a tiempo (p. ej. dos
+  // manejadores de evento disparándose casi simultáneamente).
+  var ahoraTxt = Date.now()/1000;
+  if(txt===ultimoTextoEnviado && (ahoraTxt-ultimoTextoEnviadoSeg)<4){ return; }
+
   var s = SALAS.find(x=>x.orden===SALA_ACTUAL);
   var ahora = Date.now()/1000;
   if(ahora-ultimoEnvioSeg < s.seg){
@@ -808,6 +818,7 @@ async function enviar(){
   }
   enviando = true;
   document.getElementById('btn-send').disabled = true;
+  ultimoTextoEnviado = txt; ultimoTextoEnviadoSeg = ahoraTxt;
   inp.value='';
   var enc = await cifrar(txt, SALA_ACTUAL);
   try{
