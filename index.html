@@ -144,6 +144,35 @@ body.papel  .card-item{border-color:#eee;color:#111;}
 #dm-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;}
 #dm-input-row{display:flex;gap:6px;padding:8px;border-top:1px solid rgba(128,128,128,.2);}
 #dm-input{flex:1;padding:8px 10px;border-radius:3px;font-size:13px;background:rgba(128,128,128,.1);border:1px solid rgba(128,128,128,.3);color:inherit;}
+
+/* ── EN VIVO ── */
+@keyframes titilar{0%,100%{opacity:1;}50%{opacity:.25;}}
+#live-indicador{
+  display:none;align-items:center;gap:6px;cursor:pointer;
+  padding:4px 10px;border-radius:20px;background:#c0202f;color:#fff;
+  font-size:10px;letter-spacing:2px;flex-shrink:0;
+}
+#live-indicador .dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:titilar 1.2s infinite;}
+#live-indicador.on{display:flex;}
+
+#centro-mando-overlay .card{max-width:300px;}
+.live-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px;}
+.live-btn{padding:16px 8px;border-radius:6px;text-align:center;font-size:11px;letter-spacing:1px;cursor:pointer;border:1px solid currentColor;background:transparent;color:inherit;}
+.live-btn:active{opacity:.6;}
+.live-finalizar{margin:0 14px 14px;padding:12px;border-radius:6px;background:#c0202f;color:#fff;text-align:center;cursor:pointer;font-size:11px;letter-spacing:2px;}
+
+#live-view{display:none;position:fixed;inset:0;z-index:400;background:#000;flex-direction:column;}
+#live-view.on{display:flex;}
+#live-video-wrap{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#live-video-wrap video{width:100%;height:100%;object-fit:contain;}
+.live-logo-esquina{position:absolute;top:14px;left:14px;font-size:20px;font-weight:900;letter-spacing:2px;color:#a855f7;text-shadow:0 0 10px rgba(168,85,247,.8);z-index:10;}
+.live-logo-centro{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:64px;font-weight:900;letter-spacing:6px;color:#a855f7;text-shadow:0 0 30px rgba(168,85,247,.9);}
+#live-cerrar{position:absolute;top:14px;right:14px;z-index:10;background:rgba(0,0,0,.6);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;}
+#live-chat-panel{height:34%;display:flex;flex-direction:column;background:#0a0a0a;border-top:1px solid rgba(168,85,247,.3);}
+#live-chat-msgs{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:6px;}
+#live-chat-msgs .msg-burbuja{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#fff;font-size:13px;padding:6px 10px;}
+#live-chat-input-row{display:flex;gap:6px;padding:8px;border-top:1px solid rgba(168,85,247,.2);}
+#live-chat-input{flex:1;padding:8px 10px;border-radius:3px;font-size:13px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.4);color:#fff;}
 </style>
 </head>
 <body class="matrix">
@@ -216,6 +245,7 @@ body.papel  .card-item{border-color:#eee;color:#111;}
       <div class="header-sala" id="h-sala">· · ·</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
+      <div id="live-indicador" onclick="entrarLive()"><div class="dot"></div>EN VIVO</div>
       <div class="icon-btn" onclick="abrirDMBandeja()">✉</div>
       <div class="icon-btn" onclick="verPerfil(U.nombre)">☰</div>
     </div>
@@ -270,12 +300,44 @@ body.papel  .card-item{border-color:#eee;color:#111;}
     <div class="card-item" onclick="verPerfil(U.nombre)">👤 Mi perfil</div>
     <div class="card-item" onclick="abrirAgenda()">📇 Mi agenda (<span id="menu-agenda-count">0</span>/70)</div>
     <div class="card-item" id="menu-crear-link-mod" style="display:none;" onclick="crearLinkModerador()">🛡 Sumar moderador de apoyo</div>
+    <div class="card-item" id="menu-centro-mando" style="display:none;color:#a855f7;" onclick="abrirCentroMando()">🟣 CENTRO DE MANDO (EN VIVO)</div>
     <div class="card-item" id="menu-msg-ceo" style="display:none;" onclick="abrirDM('∆luisalfonsocastillejo°')">✉ Escribir al Caballero Violeta C.E.O.</div>
     <div class="card-item peligro" onclick="cerrarSesion()">⏻ Cerrar sesión</div>
   </div>
 </div>
 
+<!-- CENTRO DE MANDO (solo Caballero Violeta C.E.O.) -->
+<div class="overlay" id="centro-mando-overlay" onclick="cerrarOverlay('centro-mando-overlay')">
+  <div class="card" onclick="event.stopPropagation()">
+    <div class="card-header" style="color:#a855f7;">🟣 CENTRO DE MANDO</div>
+    <div class="live-btn-grid">
+      <div class="live-btn" onclick="iniciarLive('camara')">📹<br>Cámara</div>
+      <div class="live-btn" onclick="iniciarLive('pantalla')">🖥<br>Compartir pantalla</div>
+      <div class="live-btn" onclick="iniciarLive('audio')">🎙<br>Solo audio</div>
+      <div class="live-btn" onclick="cerrarOverlay('centro-mando-overlay')">✕<br>Cerrar</div>
+    </div>
+    <div class="live-finalizar" onclick="finalizarLive()">■ FINALIZAR TRANSMISIÓN</div>
+  </div>
+</div>
+
+<!-- PANTALLA DEL DIRECTO (emisor y espectadores) -->
+<div id="live-view">
+  <button id="live-cerrar" onclick="salirDeLive()">✕</button>
+  <div id="live-video-wrap">
+    <div class="live-logo-esquina" id="live-logo-esquina" style="display:none;">∆°</div>
+    <div class="live-logo-centro" id="live-logo-centro" style="display:none;">∆°</div>
+  </div>
+  <div id="live-chat-panel">
+    <div id="live-chat-msgs"></div>
+    <div id="live-chat-input-row">
+      <input id="live-chat-input" placeholder="escribe en el directo..." onkeydown="if(event.key==='Enter')enviarLiveChat()">
+      <button class="btn" style="width:auto;padding:8px 12px;" onclick="enviarLiveChat()">➤</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
 <script>
 'use strict';
 /* ═══════════════════════════════════════════════════
@@ -313,6 +375,17 @@ try {
 } catch(x){ console.error(x); }
 
 var CEO_NOMBRE = '∆luisalfonsocastillejo°';
+
+/* URL de tu Edge Function de Supabase que genera los tokens de LiveKit.
+   Reemplaza SBURL_PROYECTO si tu proyecto cambia. */
+var EDGE_TOKEN_URL = SBURL + '/functions/v1/generar-token-live';
+
+var liveRoom = null;        // instancia LivekitClient.Room activa
+var esBroadcaster = false;
+var ultimoEnvioLiveSeg = 0;
+var liveChatUltimoId = null;
+var livePollTid = null;
+
 var SALAS = [
   {orden:1,nombre:'Caballo Blanco',meta:2250,seg:60},
   {orden:2,nombre:'Caballo Rojo',meta:4500,seg:120},
@@ -461,6 +534,8 @@ async function entrarApp(){
   renderSalas();
   await cambiarSala(1);
   actualizarMenuRoles();
+  pollEstadoLive();
+  livePollTid = setInterval(pollEstadoLive, 5000);
 }
 
 function actualizarMenuRoles(){
@@ -469,6 +544,7 @@ function actualizarMenuRoles(){
   }
   if(U.rol==='centro_mando'){
     document.getElementById('menu-crear-link-mod').style.display='flex';
+    document.getElementById('menu-centro-mando').style.display='flex';
   }
 }
 
@@ -874,6 +950,168 @@ function cerrarSesion(){
 
 function escHtml(txt){
   return String(txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+
+/* ── EN VIVO (LiveKit) ──
+   Reglas:
+   - Solo el Centro de Mando puede transmitir (verificado por la Edge Function
+     en el servidor, no por el navegador).
+   - No se graba nada: LiveKit no graba por defecto salvo que se active
+     explícitamente la función de "Egress", que aquí nunca se enciende.
+   - El estado (activo/tipo) vive en pc_live_estado y se sondea cada 5s. */
+
+function abrirCentroMando(){
+  cerrarOverlay('menu-overlay');
+  document.getElementById('centro-mando-overlay').classList.add('on');
+}
+
+async function pedirTokenLive(rol){
+  var resp = await fetch(EDGE_TOKEN_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ nombre:U.nombre, rol:rol })
+  });
+  if(!resp.ok){ var e = await resp.json().catch(()=>({error:'error desconocido'})); throw new Error(e.error||'No se pudo obtener el token'); }
+  return resp.json();
+}
+
+async function iniciarLive(tipo){
+  cerrarOverlay('centro-mando-overlay');
+  try{
+    var {token,url} = await pedirTokenLive('broadcaster');
+    liveRoom = new LivekitClient.Room();
+    await liveRoom.connect(url, token);
+    esBroadcaster = true;
+
+    if(tipo==='camara'){
+      await liveRoom.localParticipant.setCameraEnabled(true);
+      await liveRoom.localParticipant.setMicrophoneEnabled(true);
+    } else if(tipo==='pantalla'){
+      await liveRoom.localParticipant.setScreenShareEnabled(true);
+      await liveRoom.localParticipant.setMicrophoneEnabled(true);
+    } else if(tipo==='audio'){
+      await liveRoom.localParticipant.setMicrophoneEnabled(true);
+    }
+
+    await sb.from('pc_live_estado').update({
+      activo:true, tipo:tipo, iniciado_en:new Date().toISOString()
+    }).eq('id',1);
+
+    abrirPantallaLive(tipo, true);
+  }catch(x){ alert('No se pudo iniciar el directo: '+x.message); }
+}
+
+async function finalizarLive(){
+  cerrarOverlay('centro-mando-overlay');
+  try{
+    if(liveRoom){ await liveRoom.disconnect(); liveRoom=null; }
+    await sb.from('pc_live_estado').update({activo:false, tipo:null}).eq('id',1);
+    await sb.from('pc_live_chat').delete().neq('id',0); // limpia el chat interno al terminar
+    esBroadcaster = false;
+    document.getElementById('live-view').classList.remove('on');
+  }catch(x){ alert('Error al finalizar la transmisión'); }
+}
+
+async function pollEstadoLive(){
+  try{
+    var {data} = await sb.from('pc_live_estado').select('activo,tipo').eq('id',1).maybeSingle();
+    var ind = document.getElementById('live-indicador');
+    if(data && data.activo){ ind.classList.add('on'); } else { ind.classList.remove('on'); }
+  }catch(x){}
+}
+
+async function entrarLive(){
+  if(esBroadcaster){ // el CEO reabre su propia vista sin pedir token nuevo
+    var {data} = await sb.from('pc_live_estado').select('tipo').eq('id',1).maybeSingle();
+    abrirPantallaLive(data?data.tipo:'camara', true);
+    return;
+  }
+  try{
+    var {data:estado} = await sb.from('pc_live_estado').select('activo,tipo').eq('id',1).maybeSingle();
+    if(!estado || !estado.activo){ alert('El directo ya terminó.'); return; }
+    var {token,url} = await pedirTokenLive('viewer');
+    liveRoom = new LivekitClient.Room();
+    liveRoom.on(LivekitClient.RoomEvent.TrackSubscribed, function(track){
+      if(track.kind==='video'){
+        var el = track.attach();
+        var wrap = document.getElementById('live-video-wrap');
+        wrap.querySelectorAll('video').forEach(v=>v.remove());
+        wrap.appendChild(el);
+      } else if(track.kind==='audio'){
+        track.attach(); // el audio se reproduce solo, no necesita estar visible
+      }
+    });
+    await liveRoom.connect(url, token);
+    abrirPantallaLive(estado.tipo, false);
+  }catch(x){ alert('No se pudo entrar al directo: '+x.message); }
+}
+
+function abrirPantallaLive(tipo, soyBroadcaster){
+  document.getElementById('live-view').classList.add('on');
+  var esquina = document.getElementById('live-logo-esquina');
+  var centro = document.getElementById('live-logo-centro');
+  if(tipo==='audio'){
+    esquina.style.display='none'; centro.style.display='flex';
+  } else {
+    esquina.style.display='block'; centro.style.display='none';
+  }
+  liveChatUltimoId = null;
+  document.getElementById('live-chat-msgs').innerHTML='';
+  cargarLiveChat();
+}
+
+async function salirDeLive(){
+  document.getElementById('live-view').classList.remove('on');
+  if(liveRoom && !esBroadcaster){ await liveRoom.disconnect(); liveRoom=null; }
+  // Si soy el broadcaster, la transmisión sigue activa para los demás aunque yo cierre esta vista;
+  // para terminarla de verdad hay que usar "■ FINALIZAR TRANSMISIÓN" en el Centro de Mando.
+}
+
+/* ── CHAT INTERNO DEL DIRECTO (mismo sistema de cifrado, intervalo corto de 8s) ── */
+async function cargarLiveChat(){
+  try{
+    var q = sb.from('pc_live_chat').select('id,nombre,contenido_cifrado,iv,creado_en').order('creado_en',{ascending:true}).limit(60);
+    if(liveChatUltimoId) q = q.gt('id', liveChatUltimoId);
+    var {data} = await q;
+    if(!data) return;
+    var cont = document.getElementById('live-chat-msgs');
+    for(var i=0;i<data.length;i++){
+      var m = data[i];
+      var texto = await descifrarConEtiqueta(m.contenido_cifrado, m.iv, 'papirochat-live-chat');
+      var div = document.createElement('div');
+      div.className='msg '+(eqNombre(m.nombre,U.nombre)?'mio':'otro');
+      div.innerHTML = '<div class="msg-header">'+escHtml(m.nombre)+'</div><div class="msg-burbuja">'+escHtml(texto)+'</div>';
+      cont.appendChild(div);
+      liveChatUltimoId = m.id;
+    }
+    cont.scrollTop = cont.scrollHeight;
+  }catch(x){}
+}
+setInterval(function(){ if(document.getElementById('live-view').classList.contains('on')) cargarLiveChat(); }, 3000);
+
+async function enviarLiveChat(){
+  var inp = document.getElementById('live-chat-input');
+  var txt = inp.value.trim();
+  if(!txt) return;
+  var ahora = Date.now()/1000;
+  if(ahora-ultimoEnvioLiveSeg < 8){ return; } // intervalo corto fijo para el chat en vivo
+  inp.value='';
+  var enc = await cifrarConEtiqueta(txt, 'papirochat-live-chat');
+  try{
+    await sb.from('pc_live_chat').insert({nombre:U.nombre, contenido_cifrado:enc.c, iv:enc.iv});
+    ultimoEnvioLiveSeg = ahora;
+    await cargarLiveChat();
+  }catch(x){}
+}
+async function descifrarConEtiqueta(c64, iv64, etiqueta){
+  try{
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('papirochat-'+etiqueta));
+    var key = await crypto.subtle.importKey('raw', buf, {name:'AES-GCM'}, false, ['decrypt']);
+    var c = Uint8Array.from(atob(c64), ch=>ch.charCodeAt(0));
+    var iv = Uint8Array.from(atob(iv64), ch=>ch.charCodeAt(0));
+    var dec = await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, key, c);
+    return new TextDecoder().decode(dec);
+  }catch(x){ return '[mensaje ilegible]'; }
 }
 
 /* ── AUTO-LOGIN SI HAY SESIÓN GUARDADA ── */
