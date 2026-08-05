@@ -965,11 +965,13 @@ function abrirCentroMando(){
   document.getElementById('centro-mando-overlay').classList.add('on');
 }
 
-async function pedirTokenLive(rol){
+async function pedirTokenLive(rol, passHashVerif){
+  var body = { nombre:U.nombre, rol:rol };
+  if(passHashVerif) body.pass_hash = passHashVerif;
   var resp = await fetch(EDGE_TOKEN_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ nombre:U.nombre, rol:rol })
+    body: JSON.stringify(body)
   });
   if(!resp.ok){ var e = await resp.json().catch(()=>({error:'error desconocido'})); throw new Error(e.error||'No se pudo obtener el token'); }
   return resp.json();
@@ -977,8 +979,11 @@ async function pedirTokenLive(rol){
 
 async function iniciarLive(tipo){
   cerrarOverlay('centro-mando-overlay');
+  var passIngresada = prompt('Confirma tu contraseña para iniciar el directo:');
+  if(!passIngresada){ return; }
+  var passHashVerif = await hashPass(passIngresada);
   try{
-    var {token,url} = await pedirTokenLive('broadcaster');
+    var {token,url} = await pedirTokenLive('broadcaster', passHashVerif);
     liveRoom = new LivekitClient.Room();
     await liveRoom.connect(url, token);
     esBroadcaster = true;
