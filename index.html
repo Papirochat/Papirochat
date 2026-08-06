@@ -100,31 +100,36 @@ body.carta .btn, body.cristiano .btn{font-size:14px;}
 #chat-header{padding:8px 10px;display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .header-left-col{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;}
 .header-icons-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;padding-top:2px;}
-.banner-apoyo-mini{width:44px;height:44px;border-radius:6px;object-fit:cover;border:2px solid var(--accent);cursor:pointer;}
+.banner-apoyo-mini{width:76px;height:76px;border-radius:6px;object-fit:cover;border:2px solid var(--accent);cursor:pointer;}
 
-/* Banner tipo matriz de puntos (LED) — tamaño compacto */
+/* Banner tipo matriz de puntos (LED) */
 #banner-wrap{
-  flex:1;height:38px;position:relative;border-radius:6px;overflow:hidden;cursor:pointer;
+  flex:1;height:130px;position:relative;border-radius:8px;overflow:hidden;cursor:pointer;
   background:
-    radial-gradient(circle, var(--accent) 1.1px, transparent 1.3px) 0 0/7px 7px,
+    radial-gradient(circle, var(--accent) 1.6px, transparent 1.8px) 0 0/11px 11px,
     #0b0b0b;
-  border:2px solid var(--accent);
+  border:3px solid var(--accent);
   margin-top:2px;
 }
 #banner-dots{position:absolute;inset:0;opacity:.35;pointer-events:none;}
 #banner-marquee-track{position:absolute;inset:0;display:flex;align-items:center;white-space:nowrap;}
 #banner-texto-marquee{
   display:inline-block;padding-left:100%;
-  color:var(--accent);font-family:'Share Tech Mono',monospace;font-weight:700;font-size:13px;letter-spacing:2px;
-  text-shadow:0 0 6px var(--accent);
+  color:var(--accent);font-family:'Share Tech Mono',monospace;font-weight:700;font-size:24px;letter-spacing:2px;
+  text-shadow:0 0 8px var(--accent);
   animation:banner-scroll linear infinite;
 }
 @keyframes banner-scroll{ from{transform:translateX(0);} to{transform:translateX(-100%);} }
 
-/* Ventana de lectura completa del banner */
+/* Ventana de lectura completa del banner (texto protagonista) */
 .banner-lectura{padding:18px;text-align:center;}
-.banner-lectura img.apoyo{width:100%;max-width:260px;aspect-ratio:1/1;object-fit:cover;border-radius:6px;cursor:pointer;margin:0 auto 12px;display:block;border:2px solid var(--accent);}
-.banner-lectura .texto-completo{font-size:15px;line-height:1.8;text-align:left;padding:0 6px;}
+.banner-lectura img.apoyo{width:100%;max-width:120px;aspect-ratio:1/1;object-fit:cover;border-radius:6px;cursor:pointer;float:right;margin:0 0 10px 12px;border:2px solid var(--accent);}
+.banner-lectura .texto-completo{font-size:16px;line-height:1.8;text-align:left;padding:0 6px;}
+
+/* Ventana "Imagen de Apoyo" (imagen protagonista, fija; solo el texto hace scroll) */
+.banner-imagen-card{display:flex;flex-direction:column;max-height:85vh;}
+.banner-imagen-fija{width:100%;aspect-ratio:1/1;object-fit:cover;flex-shrink:0;border-bottom:3px solid var(--accent);}
+.banner-texto-scroll{flex:1;min-height:0;overflow-y:auto;padding:16px;font-size:15px;line-height:1.8;text-align:left;}
 
 /* Formulario de edición del banner (solo CEO) */
 .banner-form{padding:14px;display:flex;flex-direction:column;gap:10px;}
@@ -300,7 +305,7 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
   <div id="chat-header">
     <div class="header-left-col">
       <div class="header-logo" onclick="abrirMenuPrincipal()">∆°</div>
-      <img id="banner-apoyo-mini" class="banner-apoyo-mini" src="" style="display:none;" onclick="verFotoAmpliada(BANNER_ACTUAL?BANNER_ACTUAL.imagen_apoyo:'',null)">
+      <img id="banner-apoyo-mini" class="banner-apoyo-mini" src="" style="display:none;" onclick="abrirImagenApoyo()">
     </div>
     <div id="banner-wrap" onclick="abrirBannerCompleto()">
       <div id="banner-dots"></div>
@@ -359,11 +364,20 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
   </div>
 </div>
 
-<!-- BANNER: lectura completa -->
+<!-- ∆Banner°: TOCAR EL TEXTO → "Tema del Día", protagonista el texto, imagen en miniatura -->
 <div class="overlay" id="banner-lectura-overlay" onclick="cerrarOverlay('banner-lectura-overlay')">
   <div class="card" onclick="event.stopPropagation()">
     <div class="card-close-x"><span onclick="cerrarOverlay('banner-lectura-overlay')">✕</span></div>
     <div class="banner-lectura" id="banner-lectura-content"></div>
+  </div>
+</div>
+
+<!-- ∆Banner°: TOCAR LA MINIATURA → "Imagen de Apoyo", protagonista la imagen (fija), texto con scroll propio -->
+<div class="overlay" id="banner-imagen-overlay" onclick="cerrarOverlay('banner-imagen-overlay')">
+  <div class="card banner-imagen-card" onclick="event.stopPropagation()">
+    <div class="card-close-x"><span onclick="cerrarOverlay('banner-imagen-overlay')">✕</span></div>
+    <img id="banner-imagen-grande" class="banner-imagen-fija">
+    <div class="banner-texto-scroll" id="banner-imagen-texto"></div>
   </div>
 </div>
 
@@ -473,6 +487,7 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
 <!-- PANTALLA DEL DIRECTO -->
 <div id="live-view">
   <button id="live-cerrar" onclick="salirDeLive()">✕</button>
+  <div id="live-estado-diag" style="display:none;position:absolute;top:14px;left:14px;right:60px;z-index:10;background:rgba(0,0,0,.75);color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;text-align:center;"></div>
   <div id="live-video-wrap">
     <div class="live-logo-esquina" id="live-logo-esquina" style="display:none;">∆°</div>
     <div class="live-logo-centro" id="live-logo-centro" style="display:none;">∆°</div>
@@ -1031,9 +1046,16 @@ function abrirBannerCompleto(){
   var cont = document.getElementById('banner-lectura-content');
   var texto = (d && d.texto) ? d.texto : 'Aún no se ha publicado un tema.';
   cont.innerHTML =
-    (d && d.imagen_apoyo ? '<img class="apoyo" src="'+d.imagen_apoyo+'" onclick="verFotoAmpliada(\''+d.imagen_apoyo+'\',null)">' : '') +
+    (d && d.imagen_apoyo ? '<img class="apoyo" src="'+d.imagen_apoyo+'">' : '') +
     '<div class="texto-completo">'+escHtml(texto)+'</div>';
   document.getElementById('banner-lectura-overlay').classList.add('on');
+}
+function abrirImagenApoyo(){
+  var d = BANNER_ACTUAL;
+  if(!d || !d.imagen_apoyo) return;
+  document.getElementById('banner-imagen-grande').src = d.imagen_apoyo;
+  document.getElementById('banner-imagen-texto').innerHTML = escHtml(d.texto || 'Aún no se ha publicado un tema.');
+  document.getElementById('banner-imagen-overlay').classList.add('on');
 }
 
 /* ── Construcción de paletas con palomita de confirmación ── */
@@ -1600,46 +1622,98 @@ async function pollEstadoLive(){
     // cualquier motivo — no solo por presionar Finalizar), se apaga solo.
     var latidoReciente = data && data.ultimo_latido && (Date.now() - new Date(data.ultimo_latido).getTime()) < 30000;
     if(data && data.activo && latidoReciente){ ind.classList.add('on'); }
-    else { ind.classList.remove('on'); if(document.getElementById('live-view').classList.contains('on') && !esBroadcaster) salirDeLive(); }
+    else {
+      ind.classList.remove('on');
+      if(!esBroadcaster && liveRoom){
+        // El directo terminó de verdad (o el latido se puso viejo): aquí sí
+        // desconectamos por completo, a diferencia de salirDeLive() que solo
+        // cierra la vista sin cortar la conexión mientras el directo sigue activo.
+        try{ liveRoom.disconnect(); }catch(x){}
+        liveRoom = null;
+      }
+      if(document.getElementById('live-view').classList.contains('on') && !esBroadcaster){
+        document.getElementById('live-view').classList.remove('on');
+      }
+    }
   }catch(x){}
 }
+var entrandoLiveViewer = false;
 async function entrarLive(){
   if(esBroadcaster){
     var {data} = await sb.from('pc_live_estado').select('tipo').eq('id',1).maybeSingle();
     abrirPantallaLive(data?data.tipo:'camara', true);
     return;
   }
+  // Si ya estás conectado (p.ej. tocaste el botón antes y no viste respuesta
+  // inmediata y volviste a tocar), NO vuelvas a conectar: LiveKit expulsa la
+  // conexión anterior cuando detecta la misma identidad conectándose dos
+  // veces — eso probablemente es lo que causaba el corte a los ~10s: cada
+  // toque de más te desconectaba a ti mismo de tu conexión anterior.
+  if(liveRoom && liveRoom.state==='connected'){
+    abrirPantallaLive(null, false);
+    return;
+  }
+  if(entrandoLiveViewer) return;
+  entrandoLiveViewer = true;
+  mostrarEstadoLive('Conectando...');
   try{
     var {data:estado} = await sb.from('pc_live_estado').select('activo,tipo').eq('id',1).maybeSingle();
-    if(!estado || !estado.activo){ alert('El directo ya terminó.'); return; }
+    if(!estado || !estado.activo){ alert('El directo ya terminó.'); entrandoLiveViewer=false; return; }
     var {token,url} = await pedirTokenLive('viewer');
     liveRoom = new LivekitClient.Room();
     liveRoom.on(LivekitClient.RoomEvent.TrackSubscribed, function(track){
-      if(track.kind==='video'){ attachVideoResiliente(track); }
+      if(track.kind==='video'){ attachVideoResiliente(track); mostrarEstadoLive(''); }
       else if(track.kind==='audio'){ track.attach(); }
     });
-    liveRoom.on(LivekitClient.RoomEvent.TrackUnsubscribed, function(track){
-      track.detach();
+    liveRoom.on(LivekitClient.RoomEvent.TrackUnsubscribed, function(track){ track.detach(); });
+    liveRoom.on(LivekitClient.RoomEvent.Reconnecting, function(){
+      console.warn('[EN VIVO] Reconectando...');
+      mostrarEstadoLive('Se cortó la señal, reconectando...');
     });
-    liveRoom.on(LivekitClient.RoomEvent.Disconnected, function(){
-      document.getElementById('live-view').classList.remove('on');
+    liveRoom.on(LivekitClient.RoomEvent.Reconnected, function(){
+      console.warn('[EN VIVO] Reconectado');
+      mostrarEstadoLive('');
+    });
+    liveRoom.on(LivekitClient.RoomEvent.Disconnected, function(reason){
+      // Este log es justo lo que pide revisar la consola (F12): aquí queda
+      // la razón exacta por la que LiveKit cerró la conexión.
+      console.warn('[EN VIVO] Desconectado. Razón:', reason);
+      mostrarEstadoLive('Se cerró la conexión (motivo: '+(reason||'desconocido')+')');
+      liveRoom = null;
     });
     await liveRoom.connect(url, token);
     abrirPantallaLive(estado.tipo, false);
-  }catch(x){ alert('No se pudo entrar al directo: '+x.message); }
+    mostrarEstadoLive('');
+  }catch(x){
+    console.error('[EN VIVO] Error al conectar:', x);
+    alert('No se pudo entrar al directo: '+x.message);
+  }
+  entrandoLiveViewer = false;
+}
+function mostrarEstadoLive(texto){
+  var el = document.getElementById('live-estado-diag');
+  if(!el) return;
+  el.textContent = texto;
+  el.style.display = texto ? 'block' : 'none';
 }
 function abrirPantallaLive(tipo, soyBroadcaster){
   document.getElementById('live-view').classList.add('on');
-  var esquina = document.getElementById('live-logo-esquina'); var centro = document.getElementById('live-logo-centro');
-  if(tipo==='audio'){ esquina.style.display='none'; centro.style.display='flex'; }
-  else { esquina.style.display='block'; centro.style.display='none'; }
+  if(tipo){
+    var esquina = document.getElementById('live-logo-esquina'); var centro = document.getElementById('live-logo-centro');
+    if(tipo==='audio'){ esquina.style.display='none'; centro.style.display='flex'; }
+    else { esquina.style.display='block'; centro.style.display='none'; }
+  }
   liveChatUltimoId = null;
   document.getElementById('live-chat-msgs').innerHTML='';
   cargarLiveChat();
 }
 async function salirDeLive(){
   document.getElementById('live-view').classList.remove('on');
-  if(liveRoom && !esBroadcaster){ await liveRoom.disconnect(); liveRoom=null; }
+  // Ya NO desconecta al salir de la vista si sigues siendo espectador de un
+  // directo activo — así, si vuelves a tocar el botón rojo, reabre la MISMA
+  // conexión en vez de crear una nueva (ver nota en entrarLive). Solo se
+  // desconecta de verdad cuando el directo realmente termina (lo maneja
+  // pollEstadoLive) o al cerrar sesión.
 }
 async function cargarLiveChat(){
   try{
