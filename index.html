@@ -45,6 +45,7 @@ body.notichat .logo-txt, body.notichat .sala-header-elegante .titulo, body.notic
   font-family:'Crimson Pro',serif; font-weight:900; text-transform:uppercase; letter-spacing:1px;
 }
 body.notichat .msg-burbuja{border-width:2px;font-size:16px;}
+body.notichat .msg.mio .msg-burbuja{color:#fff;} /* burbuja propia es negra en este tema — el texto debe ser blanco para poder leerse */
 body.notichat .card-header{border-bottom:3px double #111;font-weight:900;text-transform:uppercase;}
 body.cristiano{
   --bg:#f2e9d8; --fg:#4a2c1a; --font:'Crimson Pro',serif; --accent:#8b2f2f;
@@ -123,12 +124,12 @@ body.carta .btn, body.cristiano .btn{font-size:14px;}
 
 /* Ventana de lectura completa del banner (texto protagonista) */
 .banner-lectura{padding:18px;text-align:center;}
-.banner-lectura img.apoyo{width:100%;max-width:120px;aspect-ratio:1/1;object-fit:cover;border-radius:6px;cursor:pointer;float:right;margin:0 0 10px 12px;border:2px solid var(--accent);}
+.banner-lectura img.apoyo{max-width:120px;max-height:160px;width:auto;height:auto;object-fit:contain;border-radius:6px;cursor:pointer;float:right;margin:0 0 10px 12px;border:2px solid var(--accent);}
 .banner-lectura .texto-completo{font-size:16px;line-height:1.8;text-align:left;padding:0 6px;}
 
 /* Ventana "Imagen de Apoyo" (imagen protagonista, fija; solo el texto hace scroll) */
 .banner-imagen-card{display:flex;flex-direction:column;max-height:85vh;}
-.banner-imagen-fija{width:100%;aspect-ratio:1/1;object-fit:cover;flex-shrink:0;border-bottom:3px solid var(--accent);}
+.banner-imagen-fija{width:100%;max-height:55vh;object-fit:contain;flex-shrink:0;border-bottom:3px solid var(--accent);background:#000;}
 .banner-texto-scroll{flex:1;min-height:0;overflow-y:auto;padding:16px;font-size:15px;line-height:1.8;text-align:left;}
 
 /* Formulario de edición del banner (solo CEO) */
@@ -138,6 +139,9 @@ body.carta .btn, body.cristiano .btn{font-size:14px;}
 .color-swatch.activo::after{content:"✔";color:#fff;font-size:16px;font-weight:900;text-shadow:0 0 3px #000,0 0 3px #000;}
 .color-swatch.activo{box-shadow:0 0 0 3px var(--accent);}
 .swatch-label{font-size:11px;opacity:.7;letter-spacing:1px;margin-top:2px;}
+.opcion-pill{padding:8px 14px;border-radius:20px;border:2px solid var(--accent);cursor:pointer;font-size:12px;position:relative;}
+.opcion-pill.activo{background:var(--accent);color:var(--bg);font-weight:900;}
+.opcion-pill.activo::after{content:" ✔";}
 
 /* Botón X de cerrar el panel ∆° sin cerrar sesión */
 .card-close-x{position:sticky;top:0;text-align:right;padding:6px 10px 0;background:var(--card-bg);z-index:5;}
@@ -396,6 +400,12 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
       <div class="swatch-label">COLOR DEL CUADRO Y LOS PUNTOS:</div>
       <div class="color-swatches" id="swatches-caja"></div>
 
+      <div class="swatch-label">TAMAÑO DE LA LETRA:</div>
+      <div class="color-swatches" id="opciones-tamano"></div>
+
+      <div class="swatch-label">VELOCIDAD DEL DESPLAZAMIENTO:</div>
+      <div class="color-swatches" id="opciones-velocidad"></div>
+
       <label class="btn secundario" style="cursor:pointer;">Cargar imagen de apoyo (cuadrada)<input type="file" id="banner-img-apoyo-input" accept="image/*" style="display:none;" onchange="previsualizarBannerApoyo()"></label>
       <img id="banner-apoyo-preview" style="max-width:120px;border-radius:6px;display:none;">
       <button class="btn" onclick="guardarBanner()">Publicar en el banner</button>
@@ -594,13 +604,46 @@ function toggleOjo(inputId, ojoId){
   if(inp.type==='password'){ inp.type='text'; ojo.style.opacity=1; } else { inp.type='password'; ojo.style.opacity=.6; }
 }
 var IMG_BASE64 = '';
-function previsualizarImagen(){
+/* ── Compresión automática de imágenes ──
+   Antes se rechazaban imágenes de más de 900KB tal cual venían del
+   teléfono (fotos normales de cámara fácilmente pesan 3-8MB). Ahora se
+   redimensionan (máx. 1280px de lado más largo) y se comprimen a JPEG
+   calidad 87% ANTES de subirlas — el usuario ya no tiene que preocuparse
+   por el peso, y la proporción original (vertical, horizontal, cuadrada)
+   se mantiene intacta porque solo se reduce escala, nunca se recorta. */
+function comprimirImagen(file){
+  return new Promise(function(resolve, reject){
+    if(!file.type.startsWith('image/')){ reject(new Error('No es una imagen')); return; }
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var maxLado = 1280;
+        var w = img.width, h = img.height;
+        if(w > maxLado || h > maxLado){
+          if(w >= h){ h = Math.round(h * (maxLado/w)); w = maxLado; }
+          else { w = Math.round(w * (maxLado/h)); h = maxLado; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.87));
+      };
+      img.onerror = function(){ reject(new Error('No se pudo leer la imagen')); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function(){ reject(new Error('No se pudo leer el archivo')); };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function previsualizarImagen(){
   var file = document.getElementById('rg-img-input').files[0];
   if(!file) return;
-  if(file.size > 900*1024){ alert('La imagen es muy pesada. Usa una de menos de 900KB.'); return; }
-  var reader = new FileReader();
-  reader.onload = function(e){ IMG_BASE64 = e.target.result; document.getElementById('rg-img-preview').src = IMG_BASE64; };
-  reader.readAsDataURL(file);
+  try{
+    IMG_BASE64 = await comprimirImagen(file);
+    document.getElementById('rg-img-preview').src = IMG_BASE64;
+  }catch(x){ alert('No se pudo procesar la imagen. Prueba con otra.'); }
 }
 
 /* ── REGISTRO ── */
@@ -1006,9 +1049,24 @@ function abrirMenuPrincipal(){
   document.getElementById('menu-overlay').classList.add('on');
 }
 
+var TAMANOS_BANNER = { pequena:'18px', mediana:'25px', grande:'34px' }; // "grande" casi toca el borde superior/inferior del banner (130px de alto)
+var VELOCIDADES_BANNER = { baja:1.7, normal:1, alta:0.5 }; // multiplican la duración: más alto = más lento
+
+function pintarPildoras(contenedorId, opciones, valorActivo, onElegir){
+  var cont = document.getElementById(contenedorId);
+  cont.innerHTML = '';
+  Object.keys(opciones).forEach(function(clave){
+    var p = document.createElement('div');
+    p.className = 'opcion-pill' + (clave===valorActivo ? ' activo' : '');
+    p.textContent = opciones[clave];
+    p.onclick = function(){ onElegir(clave); };
+    cont.appendChild(p);
+  });
+}
+
 /* ── ∆Banner° ── */
 var BANNER_ACTUAL = null;
-var PALETA_BANNER = ['#a855f7','#00ff41','#ff4b3e','#ffe066','#38bdf8','#ffffff'];
+var PALETA_BANNER = ['#a855f7','#00ff41','#ff4b3e','#ffe066','#38bdf8','#ffffff','#000000'];
 
 function colorTextoEfectivo(d){
   return localStorage.getItem('pc_banner_color_texto') || (d && d.color) || '#a855f7';
@@ -1029,10 +1087,12 @@ async function cargarBanner(){
     track.textContent = texto;
     track.style.color = colorTexto;
     track.style.textShadow = '0 0 6px '+colorTexto;
+    track.style.fontSize = TAMANOS_BANNER[(data && data.tamano_letra) || 'pequena'];
     document.getElementById('banner-wrap').style.borderColor = colorCaja;
     document.getElementById('banner-wrap').style.background =
       'radial-gradient(circle, '+colorCaja+' 1.1px, transparent 1.3px) 0 0/7px 7px, #0b0b0b';
-    var duracionSeg = Math.max(10, texto.length * 0.18); // más texto = animación más larga, no más rápida
+    var multiplicador = VELOCIDADES_BANNER[(data && data.velocidad) || 'normal'];
+    var duracionSeg = Math.max(6, texto.length * 0.18 * multiplicador); // más texto = animación más larga, no más rápida
     track.style.animationDuration = duracionSeg + 's';
 
     var mini = document.getElementById('banner-apoyo-mini');
@@ -1087,29 +1147,32 @@ function abrirEditorBanner(){
 
   COLOR_TEXTO_NUEVO = (d && d.color) ? d.color : '#a855f7';
   COLOR_CAJA_NUEVO = (d && d.color_caja) ? d.color_caja : COLOR_TEXTO_NUEVO;
+  TAMANO_NUEVO = (d && d.tamano_letra) || 'pequena';
+  VELOCIDAD_NUEVA = (d && d.velocidad) || 'normal';
   redibujarPaletasEditorCEO();
   document.getElementById('banner-editor-overlay').classList.add('on');
 }
+var TAMANO_NUEVO = 'pequena';
+var VELOCIDAD_NUEVA = 'normal';
 function redibujarPaletasEditorCEO(){
   pintarPaleta('swatches-texto', COLOR_TEXTO_NUEVO, function(c){ COLOR_TEXTO_NUEVO=c; redibujarPaletasEditorCEO(); });
   pintarPaleta('swatches-caja', COLOR_CAJA_NUEVO, function(c){ COLOR_CAJA_NUEVO=c; redibujarPaletasEditorCEO(); });
+  pintarPildoras('opciones-tamano', {pequena:'Pequeña',mediana:'Mediana',grande:'Grande'}, TAMANO_NUEVO, function(v){ TAMANO_NUEVO=v; redibujarPaletasEditorCEO(); });
+  pintarPildoras('opciones-velocidad', {baja:'Baja',normal:'Normal',alta:'Alta'}, VELOCIDAD_NUEVA, function(v){ VELOCIDAD_NUEVA=v; redibujarPaletasEditorCEO(); });
 }
-function previsualizarBannerApoyo(){
+async function previsualizarBannerApoyo(){
   var file = document.getElementById('banner-img-apoyo-input').files[0];
   if(!file) return;
-  if(file.size > 900*1024){ alert('Imagen muy pesada, usa una de menos de 900KB.'); return; }
-  var reader = new FileReader();
-  reader.onload = function(e){
-    IMG_APOYO_BASE64 = e.target.result;
+  try{
+    IMG_APOYO_BASE64 = await comprimirImagen(file);
     var prev = document.getElementById('banner-apoyo-preview');
     prev.src = IMG_APOYO_BASE64; prev.style.display='block';
-  };
-  reader.readAsDataURL(file);
+  }catch(x){ alert('No se pudo procesar la imagen. Prueba con otra.'); }
 }
 async function guardarBanner(){
   var texto = document.getElementById('banner-texto-input').value.trim().slice(0,777);
   try{
-    var update = { texto:texto||null, color:COLOR_TEXTO_NUEVO, color_caja:COLOR_CAJA_NUEVO, actualizado_en:new Date().toISOString() };
+    var update = { texto:texto||null, color:COLOR_TEXTO_NUEVO, color_caja:COLOR_CAJA_NUEVO, tamano_letra:TAMANO_NUEVO, velocidad:VELOCIDAD_NUEVA, actualizado_en:new Date().toISOString() };
     if(IMG_APOYO_BASE64) update.imagen_apoyo = IMG_APOYO_BASE64;
     await sb.from('pc_banner').update(update).eq('id',1);
     cerrarOverlay('banner-editor-overlay');
@@ -1242,13 +1305,11 @@ function cambiarFotoPerfil(){
   inputTemp.onchange = async function(){
     var file = inputTemp.files[0];
     if(!file) return;
-    if(file.size > 900*1024){ alert('La imagen es muy pesada. Usa una de menos de 900KB.'); return; }
-    var reader = new FileReader();
-    reader.onload = async function(e){
-      try{ await sb.from('pc_usuarios').update({imagen_url:e.target.result}).ilike('nombre',U.nombre); alert('Foto actualizada.'); verPerfil(U.nombre); }
-      catch(x){ alert('Error al actualizar la foto'); }
-    };
-    reader.readAsDataURL(file);
+    try{
+      var comprimida = await comprimirImagen(file);
+      await sb.from('pc_usuarios').update({imagen_url:comprimida}).ilike('nombre',U.nombre);
+      alert('Foto actualizada.'); verPerfil(U.nombre);
+    }catch(x){ alert('No se pudo actualizar la foto. Prueba con otra imagen.'); }
   };
   inputTemp.click();
 }
@@ -1344,14 +1405,18 @@ async function abrirNotificaciones(){
   try{
     var {data} = await sb.from('pc_notificaciones').select('*').eq('usuario_destino',U.nombre).order('creado_en',{ascending:false}).limit(50);
     var html = '<div class="card-header">∆Notificación°</div>';
-    (data||[]).forEach(function(n){
-      var expiraMs = new Date(n.creado_en).getTime() + 48*3600*1000;
-      html += '<div class="lista-fila" style="flex-direction:column;align-items:flex-start;gap:4px;">'+
-        '<div>'+escHtml(n.contenido)+'</div>'+
-        (n.tipo==='solicitud_ecosistema' ? '<div><span class="accion" onclick="responderSolicitudEcosistema('+n.id+',true)">✔ aceptar</span> <span class="accion" onclick="responderSolicitudEcosistema('+n.id+',false)">✕ rechazar</span></div>' : '')+
-        '<div class="msg-caduca" style="font-size:9px;opacity:.5;" data-expira="'+expiraMs+'"></div></div>';
-    });
-    cont.innerHTML = html || '<div class="card-header">Sin notificaciones</div>';
+    if(!data || !data.length){
+      html += '<div class="lista-fila" style="opacity:.6;">No tienes notificaciones.</div>';
+    } else {
+      data.forEach(function(n){
+        var expiraMs = new Date(n.creado_en).getTime() + 48*3600*1000;
+        html += '<div class="lista-fila" style="flex-direction:column;align-items:flex-start;gap:4px;">'+
+          '<div>'+escHtml(n.contenido)+'</div>'+
+          (n.tipo==='solicitud_ecosistema' ? '<div><span class="accion" onclick="responderSolicitudEcosistema('+n.id+',true)">✔ aceptar</span> <span class="accion" onclick="responderSolicitudEcosistema('+n.id+',false)">✕ rechazar</span></div>' : '')+
+          '<div class="msg-caduca" style="font-size:9px;opacity:.5;" data-expira="'+expiraMs+'"></div></div>';
+      });
+    }
+    cont.innerHTML = html;
     cont.querySelectorAll('.msg-caduca').forEach(actualizarUnTemporizador);
   }catch(x){ cont.innerHTML='Error al cargar'; }
   actualizarBadgeNotificaciones();
@@ -1770,14 +1835,4 @@ function escHtml(txt){
 (function(){
   var guardado = sessionStorage.getItem('pc_nombre');
   if(guardado){
-    sb.from('pc_usuarios').select('nombre,rol,estado').ilike('nombre',guardado).maybeSingle().then(function(r){
-      if(r.data && r.data.estado!=='eliminado' && r.data.estado!=='expulsado_perm' && r.data.estado!=='caducada_inasistencia'){
-        U.nombre = r.data.nombre; U.rol = r.data.rol;
-        entrarApp();
-      }
-    });
-  }
-})();
-</script>
-</body>
-</html>
+    sb.from('pc_usuarios').select('nombre,rol,estado').ilike('
