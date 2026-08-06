@@ -97,22 +97,25 @@ body.carta .btn, body.cristiano .btn{font-size:14px;}
 .th-gameboy{background:#9bbc0f;color:#0f380f;}
 
 #app-screen{display:none;flex-direction:column;height:100%;position:fixed;inset:0;}
-#chat-header{padding:8px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.header-icons-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;}
+#chat-header{padding:8px 10px;display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.header-left-col{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;}
+.header-icons-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;padding-top:2px;}
+.banner-apoyo-mini{width:44px;height:44px;border-radius:6px;object-fit:cover;border:2px solid var(--accent);cursor:pointer;}
 
-/* Banner tipo matriz de puntos (LED) */
+/* Banner tipo matriz de puntos (LED) — tamaño compacto */
 #banner-wrap{
-  flex:1;height:44px;position:relative;border-radius:6px;overflow:hidden;cursor:pointer;
+  flex:1;height:38px;position:relative;border-radius:6px;overflow:hidden;cursor:pointer;
   background:
-    radial-gradient(circle, var(--accent) 1.1px, transparent 1.3px) 0 0/8px 8px,
+    radial-gradient(circle, var(--accent) 1.1px, transparent 1.3px) 0 0/7px 7px,
     #0b0b0b;
   border:2px solid var(--accent);
+  margin-top:2px;
 }
 #banner-dots{position:absolute;inset:0;opacity:.35;pointer-events:none;}
 #banner-marquee-track{position:absolute;inset:0;display:flex;align-items:center;white-space:nowrap;}
 #banner-texto-marquee{
   display:inline-block;padding-left:100%;
-  color:var(--accent);font-family:'Share Tech Mono',monospace;font-weight:700;font-size:15px;letter-spacing:2px;
+  color:var(--accent);font-family:'Share Tech Mono',monospace;font-weight:700;font-size:13px;letter-spacing:2px;
   text-shadow:0 0 6px var(--accent);
   animation:banner-scroll linear infinite;
 }
@@ -126,7 +129,10 @@ body.carta .btn, body.cristiano .btn{font-size:14px;}
 /* Formulario de edición del banner (solo CEO) */
 .banner-form{padding:14px;display:flex;flex-direction:column;gap:10px;}
 .color-swatches{display:flex;gap:8px;flex-wrap:wrap;}
-.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid #fff;}
+.color-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid #fff;position:relative;display:flex;align-items:center;justify-content:center;}
+.color-swatch.activo::after{content:"✔";color:#fff;font-size:16px;font-weight:900;text-shadow:0 0 3px #000,0 0 3px #000;}
+.color-swatch.activo{box-shadow:0 0 0 3px var(--accent);}
+.swatch-label{font-size:11px;opacity:.7;letter-spacing:1px;margin-top:2px;}
 
 /* Botón X de cerrar el panel ∆° sin cerrar sesión */
 .card-close-x{position:sticky;top:0;text-align:right;padding:6px 10px 0;background:var(--card-bg);z-index:5;}
@@ -292,7 +298,10 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
 <!-- APP -->
 <div id="app-screen">
   <div id="chat-header">
-    <div class="header-logo" onclick="abrirMenuPrincipal()">∆°</div>
+    <div class="header-left-col">
+      <div class="header-logo" onclick="abrirMenuPrincipal()">∆°</div>
+      <img id="banner-apoyo-mini" class="banner-apoyo-mini" src="" style="display:none;" onclick="verFotoAmpliada(BANNER_ACTUAL?BANNER_ACTUAL.imagen_apoyo:'',null)">
+    </div>
     <div id="banner-wrap" onclick="abrirBannerCompleto()">
       <div id="banner-dots"></div>
       <div id="banner-marquee-track"><span id="banner-texto-marquee">· · ·</span></div>
@@ -332,6 +341,7 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
     <div class="card-item" onclick="abrirRecordReferidos()">∆Record-Referidos°</div>
     <div class="card-item" onclick="abrirNotificaciones()">∆Notificación°</div>
     <div class="card-item" onclick="abrirEcosistema()">∆Ecosistema°</div>
+    <div class="card-item" onclick="abrirEditorColorBanner()">∆Banner-Color°</div>
     <div class="card-item" id="menu-banner" style="display:none;color:#a855f7;" onclick="abrirEditorBanner()">∆Banner°</div>
     <div class="card-item" id="menu-transmision" style="display:none;color:#a855f7;" onclick="abrirCentroMando()">∆Transmisión°</div>
     <div class="card-item" id="menu-crear-link-mod" style="display:none;" onclick="crearLinkModerador()">🛡 Sumar moderador de apoyo</div>
@@ -357,7 +367,7 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
   </div>
 </div>
 
-<!-- BANNER: editor (solo CEO) -->
+<!-- BANNER: editor completo (solo CEO — texto + ambos colores) -->
 <div class="overlay" id="banner-editor-overlay" onclick="cerrarOverlay('banner-editor-overlay')">
   <div class="card" onclick="event.stopPropagation()">
     <div class="card-close-x"><span onclick="cerrarOverlay('banner-editor-overlay')">✕</span></div>
@@ -365,17 +375,33 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
     <div class="banner-form">
       <textarea class="inp" id="banner-texto-input" rows="4" maxlength="777" placeholder="Pregunta o tema a tratar (máx 777 caracteres)"></textarea>
       <div class="char-count"><span id="banner-char-count">0</span>/777</div>
-      <div>Color del banner:</div>
-      <div class="color-swatches">
-        <div class="color-swatch" style="background:#a855f7;" onclick="setColorBanner('#a855f7')"></div>
-        <div class="color-swatch" style="background:#00ff41;" onclick="setColorBanner('#00ff41')"></div>
-        <div class="color-swatch" style="background:#ff4b3e;" onclick="setColorBanner('#ff4b3e')"></div>
-        <div class="color-swatch" style="background:#ffe066;" onclick="setColorBanner('#ffe066')"></div>
-        <div class="color-swatch" style="background:#38bdf8;" onclick="setColorBanner('#38bdf8')"></div>
-      </div>
+
+      <div class="swatch-label">COLOR DE LAS LETRAS (el texto en movimiento):</div>
+      <div class="color-swatches" id="swatches-texto"></div>
+
+      <div class="swatch-label">COLOR DEL CUADRO Y LOS PUNTOS:</div>
+      <div class="color-swatches" id="swatches-caja"></div>
+
       <label class="btn secundario" style="cursor:pointer;">Cargar imagen de apoyo (cuadrada)<input type="file" id="banner-img-apoyo-input" accept="image/*" style="display:none;" onchange="previsualizarBannerApoyo()"></label>
       <img id="banner-apoyo-preview" style="max-width:120px;border-radius:6px;display:none;">
       <button class="btn" onclick="guardarBanner()">Publicar en el banner</button>
+    </div>
+  </div>
+</div>
+
+<!-- ∆Banner-Color°: cualquier usuario puede personalizar SOLO los colores que ve (no el texto) -->
+<div class="overlay" id="banner-color-overlay" onclick="cerrarOverlay('banner-color-overlay')">
+  <div class="card" onclick="event.stopPropagation()">
+    <div class="card-close-x"><span onclick="cerrarOverlay('banner-color-overlay')">✕</span></div>
+    <div class="card-header">∆Banner-Color°</div>
+    <div class="banner-form">
+      <div style="font-size:11px;opacity:.7;line-height:1.6;">Esto solo cambia cómo TÚ ves los colores del banner en tu propio dispositivo. El texto lo sigue publicando el C.E.O.</div>
+      <div class="swatch-label">COLOR DE LAS LETRAS:</div>
+      <div class="color-swatches" id="swatches-texto-user"></div>
+      <div class="swatch-label">COLOR DEL CUADRO Y LOS PUNTOS:</div>
+      <div class="color-swatches" id="swatches-caja-user"></div>
+      <button class="btn" onclick="guardarColorPersonalBanner()">Aplicar a mi banner</button>
+      <button class="btn secundario" onclick="restablecerColorBanner()">Usar el color original del C.E.O.</button>
     </div>
   </div>
 </div>
@@ -959,24 +985,39 @@ function abrirMenuPrincipal(){
 
 /* ── ∆Banner° ── */
 var BANNER_ACTUAL = null;
+var PALETA_BANNER = ['#a855f7','#00ff41','#ff4b3e','#ffe066','#38bdf8','#ffffff'];
+
+function colorTextoEfectivo(d){
+  return localStorage.getItem('pc_banner_color_texto') || (d && d.color) || '#a855f7';
+}
+function colorCajaEfectivo(d){
+  return localStorage.getItem('pc_banner_color_caja') || (d && d.color_caja) || (d && d.color) || '#a855f7';
+}
+
 async function cargarBanner(){
   try{
     var {data} = await sb.from('pc_banner').select('*').eq('id',1).maybeSingle();
     BANNER_ACTUAL = data;
     var texto = (data && data.texto) ? data.texto : 'P∆pir°Chat — el tema del día aparecerá aquí';
-    var color = (data && data.color) ? data.color : '#a855f7';
+    var colorTexto = colorTextoEfectivo(data);
+    var colorCaja = colorCajaEfectivo(data);
+
     var track = document.getElementById('banner-texto-marquee');
     track.textContent = texto;
-    track.style.color = color;
-    track.style.textShadow = '0 0 6px '+color;
-    document.getElementById('banner-wrap').style.borderColor = color;
+    track.style.color = colorTexto;
+    track.style.textShadow = '0 0 6px '+colorTexto;
+    document.getElementById('banner-wrap').style.borderColor = colorCaja;
     document.getElementById('banner-wrap').style.background =
-      'radial-gradient(circle, '+color+' 1.1px, transparent 1.3px) 0 0/8px 8px, #0b0b0b';
-    // velocidad de lectura cómoda: más texto = animación más larga (no más rápida)
-    var duracionSeg = Math.max(10, texto.length * 0.18);
+      'radial-gradient(circle, '+colorCaja+' 1.1px, transparent 1.3px) 0 0/7px 7px, #0b0b0b';
+    var duracionSeg = Math.max(10, texto.length * 0.18); // más texto = animación más larga, no más rápida
     track.style.animationDuration = duracionSeg + 's';
+
+    var mini = document.getElementById('banner-apoyo-mini');
+    if(data && data.imagen_apoyo){ mini.src = data.imagen_apoyo; mini.style.display='block'; }
+    else { mini.style.display='none'; }
   }catch(x){}
 }
+
 function abrirBannerCompleto(){
   var d = BANNER_ACTUAL;
   var cont = document.getElementById('banner-lectura-content');
@@ -986,6 +1027,25 @@ function abrirBannerCompleto(){
     '<div class="texto-completo">'+escHtml(texto)+'</div>';
   document.getElementById('banner-lectura-overlay').classList.add('on');
 }
+
+/* ── Construcción de paletas con palomita de confirmación ── */
+function pintarPaleta(contenedorId, colorActivo, onElegir){
+  var cont = document.getElementById(contenedorId);
+  cont.innerHTML = '';
+  PALETA_BANNER.forEach(function(c){
+    var sw = document.createElement('div');
+    sw.className = 'color-swatch' + (c.toLowerCase()===colorActivo.toLowerCase() ? ' activo' : '');
+    sw.style.background = c;
+    sw.onclick = function(){ onElegir(c); };
+    cont.appendChild(sw);
+  });
+}
+
+/* ── Editor completo del CEO (texto + ambos colores) ── */
+var COLOR_TEXTO_NUEVO = '#a855f7';
+var COLOR_CAJA_NUEVO = '#a855f7';
+var IMG_APOYO_BASE64 = null;
+
 function abrirEditorBanner(){
   cerrarOverlay('menu-overlay');
   var d = BANNER_ACTUAL;
@@ -993,12 +1053,17 @@ function abrirEditorBanner(){
   document.getElementById('banner-char-count').textContent = document.getElementById('banner-texto-input').value.length;
   document.getElementById('banner-texto-input').oninput = function(){ document.getElementById('banner-char-count').textContent = this.value.length; };
   if(d && d.imagen_apoyo){ document.getElementById('banner-apoyo-preview').src = d.imagen_apoyo; document.getElementById('banner-apoyo-preview').style.display='block'; }
-  COLOR_BANNER_NUEVO = (d && d.color) ? d.color : '#a855f7';
+  IMG_APOYO_BASE64 = null;
+
+  COLOR_TEXTO_NUEVO = (d && d.color) ? d.color : '#a855f7';
+  COLOR_CAJA_NUEVO = (d && d.color_caja) ? d.color_caja : COLOR_TEXTO_NUEVO;
+  redibujarPaletasEditorCEO();
   document.getElementById('banner-editor-overlay').classList.add('on');
 }
-var COLOR_BANNER_NUEVO = '#a855f7';
-var IMG_APOYO_BASE64 = null;
-function setColorBanner(c){ COLOR_BANNER_NUEVO = c; }
+function redibujarPaletasEditorCEO(){
+  pintarPaleta('swatches-texto', COLOR_TEXTO_NUEVO, function(c){ COLOR_TEXTO_NUEVO=c; redibujarPaletasEditorCEO(); });
+  pintarPaleta('swatches-caja', COLOR_CAJA_NUEVO, function(c){ COLOR_CAJA_NUEVO=c; redibujarPaletasEditorCEO(); });
+}
 function previsualizarBannerApoyo(){
   var file = document.getElementById('banner-img-apoyo-input').files[0];
   if(!file) return;
@@ -1014,12 +1079,42 @@ function previsualizarBannerApoyo(){
 async function guardarBanner(){
   var texto = document.getElementById('banner-texto-input').value.trim().slice(0,777);
   try{
-    var update = { texto:texto||null, color:COLOR_BANNER_NUEVO, actualizado_en:new Date().toISOString() };
+    var update = { texto:texto||null, color:COLOR_TEXTO_NUEVO, color_caja:COLOR_CAJA_NUEVO, actualizado_en:new Date().toISOString() };
     if(IMG_APOYO_BASE64) update.imagen_apoyo = IMG_APOYO_BASE64;
     await sb.from('pc_banner').update(update).eq('id',1);
     cerrarOverlay('banner-editor-overlay');
     cargarBanner();
+    alert('Banner publicado.');
   }catch(x){ alert('Error al guardar el banner'); }
+}
+
+/* ── ∆Banner-Color°: cualquier usuario personaliza SOLO los colores que ve ── */
+var COLOR_TEXTO_USER_TEMP = '#a855f7';
+var COLOR_CAJA_USER_TEMP = '#a855f7';
+function abrirEditorColorBanner(){
+  cerrarOverlay('menu-overlay');
+  var d = BANNER_ACTUAL;
+  COLOR_TEXTO_USER_TEMP = colorTextoEfectivo(d);
+  COLOR_CAJA_USER_TEMP = colorCajaEfectivo(d);
+  redibujarPaletasEditorUsuario();
+  document.getElementById('banner-color-overlay').classList.add('on');
+}
+function redibujarPaletasEditorUsuario(){
+  pintarPaleta('swatches-texto-user', COLOR_TEXTO_USER_TEMP, function(c){ COLOR_TEXTO_USER_TEMP=c; redibujarPaletasEditorUsuario(); });
+  pintarPaleta('swatches-caja-user', COLOR_CAJA_USER_TEMP, function(c){ COLOR_CAJA_USER_TEMP=c; redibujarPaletasEditorUsuario(); });
+}
+function guardarColorPersonalBanner(){
+  localStorage.setItem('pc_banner_color_texto', COLOR_TEXTO_USER_TEMP);
+  localStorage.setItem('pc_banner_color_caja', COLOR_CAJA_USER_TEMP);
+  cerrarOverlay('banner-color-overlay');
+  cargarBanner();
+  alert('Listo — así se ve tu banner ahora. Solo en tu dispositivo.');
+}
+function restablecerColorBanner(){
+  localStorage.removeItem('pc_banner_color_texto');
+  localStorage.removeItem('pc_banner_color_caja');
+  cerrarOverlay('banner-color-overlay');
+  cargarBanner();
 }
 
 async function actualizarBadgeContactos(){
