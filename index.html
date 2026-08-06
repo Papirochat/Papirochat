@@ -930,11 +930,12 @@ async function enviar(){
   if(!txt) return;
 
   // Red de seguridad extra: si el mismo texto exacto se intenta enviar de
-  // nuevo dentro de los 4 segundos siguientes, se bloquea. Esto cubre casos
-  // donde el candado normal no alcanzó a activarse a tiempo (p. ej. dos
-  // manejadores de evento disparándose casi simultáneamente).
+  // nuevo dentro de los 20 segundos siguientes, se bloquea. (Antes eran 4s,
+  // muy poco tiempo — si alguien no ve respuesta inmediata y vuelve a tocar
+  // 5-6 segundos después, esos 4s ya se habían vencido y dejaba pasar un
+  // segundo envío real. 20s da mucho más margen.)
   var ahoraTxt = Date.now()/1000;
-  if(txt===ultimoTextoEnviado && (ahoraTxt-ultimoTextoEnviadoSeg)<4){ return; }
+  if(txt===ultimoTextoEnviado && (ahoraTxt-ultimoTextoEnviadoSeg)<20){ return; }
 
   var s = SALAS.find(x=>x.orden===SALA_ACTUAL);
   var ahora = Date.now()/1000;
@@ -943,7 +944,10 @@ async function enviar(){
     return;
   }
   enviando = true;
-  document.getElementById('btn-send').disabled = true;
+  var btn = document.getElementById('btn-send');
+  var iconoOriginal = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳'; // retroalimentación visual clara: "se está enviando"
+  inp.disabled = true;
   ultimoTextoEnviado = txt; ultimoTextoEnviadoSeg = ahoraTxt;
   inp.value='';
   var enc = await cifrar(txt, SALA_ACTUAL);
@@ -966,9 +970,13 @@ async function enviar(){
     document.getElementById('msgs').scrollTop = document.getElementById('msgs').scrollHeight;
   }catch(x){ alert('No se pudo enviar el mensaje. Intenta de nuevo.'); }
   enviando = false;
-  document.getElementById('btn-send').disabled = false;
+  btn.disabled = false; btn.textContent = iconoOriginal;
+  inp.disabled = false;
 }
-function keyEnter(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); enviar(); } }
+function keyEnter(e){
+  if(e.isComposing) return; // evita el doble-disparo de Enter que hacen algunos teclados móviles al aceptar emoji/autocorrección
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); enviar(); }
+}
 async function incrementarContadorPosts(){
   try{
     var {data} = await sb.from('pc_usuarios').select('posts_totales').ilike('nombre',U.nombre).maybeSingle();
