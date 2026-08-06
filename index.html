@@ -35,12 +35,17 @@ body.violeta{
   --bubble-mine:#3a1f5c; --bubble-mine-b:#c084fc; --bubble-other:#26123f; --bubble-other-b:rgba(192,132,252,.4);
   --btn-bg:#c084fc; --btn-fg:#170b28;
 }
-body.venezolano{
-  --bg:#0a1a3d; --fg:#ffe066; --font:'Share Tech Mono',monospace; --accent:#ff4b3e;
-  --border:rgba(255,224,102,.3); --card-bg:#0f2251; --input-bg:#0f2251;
-  --bubble-mine:#1c3a7a; --bubble-mine-b:#ffe066; --bubble-other:#132a5e; --bubble-other-b:rgba(255,75,62,.5);
-  --btn-bg:#ff4b3e; --btn-fg:#fff;
+body.notichat{
+  --bg:#f4f4f2; --fg:#111; --font:'Crimson Pro',serif; --accent:#a30000;
+  --border:#111; --card-bg:#fff; --input-bg:#fff;
+  --bubble-mine:#111; --bubble-mine-b:#111; --bubble-other:#fff; --bubble-other-b:#111;
+  --btn-bg:#111; --btn-fg:#fff;
 }
+body.notichat .logo-txt, body.notichat .sala-header-elegante .titulo, body.notichat .header-logo{
+  font-family:'Crimson Pro',serif; font-weight:900; text-transform:uppercase; letter-spacing:1px;
+}
+body.notichat .msg-burbuja{border-width:2px;font-size:16px;}
+body.notichat .card-header{border-bottom:3px double #111;font-weight:900;text-transform:uppercase;}
 body.cristiano{
   --bg:#f2e9d8; --fg:#4a2c1a; --font:'Crimson Pro',serif; --accent:#8b2f2f;
   --border:rgba(74,44,26,.2); --card-bg:#f2e9d8; --input-bg:#fff8ee;
@@ -87,11 +92,46 @@ body.carta .btn, body.cristiano .btn{font-size:14px;}
 .th-papel{background:#111;color:#fff;}
 .th-violeta{background:#c084fc;color:#170b28;}
 .th-venezolano{background:linear-gradient(#ffe066,#0a1a3d,#ff4b3e);color:#fff;}
+.th-notichat{background:#f4f4f2;color:#111;border:2px solid #111;font-weight:900;}
 .th-cristiano{background:#8b2f2f;color:#f2e9d8;}
 .th-gameboy{background:#9bbc0f;color:#0f380f;}
 
 #app-screen{display:none;flex-direction:column;height:100%;position:fixed;inset:0;}
-#chat-header{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+#chat-header{padding:8px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.header-icons-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;}
+
+/* Banner tipo matriz de puntos (LED) */
+#banner-wrap{
+  flex:1;height:44px;position:relative;border-radius:6px;overflow:hidden;cursor:pointer;
+  background:
+    radial-gradient(circle, var(--accent) 1.1px, transparent 1.3px) 0 0/8px 8px,
+    #0b0b0b;
+  border:2px solid var(--accent);
+}
+#banner-dots{position:absolute;inset:0;opacity:.35;pointer-events:none;}
+#banner-marquee-track{position:absolute;inset:0;display:flex;align-items:center;white-space:nowrap;}
+#banner-texto-marquee{
+  display:inline-block;padding-left:100%;
+  color:var(--accent);font-family:'Share Tech Mono',monospace;font-weight:700;font-size:15px;letter-spacing:2px;
+  text-shadow:0 0 6px var(--accent);
+  animation:banner-scroll linear infinite;
+}
+@keyframes banner-scroll{ from{transform:translateX(0);} to{transform:translateX(-100%);} }
+
+/* Ventana de lectura completa del banner */
+.banner-lectura{padding:18px;text-align:center;}
+.banner-lectura img.apoyo{width:100%;max-width:260px;aspect-ratio:1/1;object-fit:cover;border-radius:6px;cursor:pointer;margin:0 auto 12px;display:block;border:2px solid var(--accent);}
+.banner-lectura .texto-completo{font-size:15px;line-height:1.8;text-align:left;padding:0 6px;}
+
+/* Formulario de edición del banner (solo CEO) */
+.banner-form{padding:14px;display:flex;flex-direction:column;gap:10px;}
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap;}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid #fff;}
+
+/* Botón X de cerrar el panel ∆° sin cerrar sesión */
+.card-close-x{position:sticky;top:0;text-align:right;padding:6px 10px 0;background:var(--card-bg);z-index:5;}
+.card-close-x span{cursor:pointer;font-size:20px;opacity:.7;padding:4px 8px;}
+
 .header-logo{font-size:26px;font-weight:900;letter-spacing:2px;cursor:pointer;color:var(--accent);line-height:1;padding:6px 12px;border:2px solid var(--accent);border-radius:10px;box-shadow:0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);}
 .header-logo:active{opacity:.75;transform:scale(.96);}
 .icon-btn{font-size:24px;cursor:pointer;opacity:.8;padding:2px 6px;}
@@ -103,9 +143,9 @@ body.carta .sala-header-elegante .titulo, body.cristiano .sala-header-elegante .
 .sala-header-elegante .meta{font-size:11px;opacity:.55;letter-spacing:2px;margin-top:4px;}
 .sala-header-elegante .secreta{font-size:11px;opacity:.35;letter-spacing:2px;margin-top:6px;}
 
-#live-indicador{display:none;align-items:center;gap:6px;cursor:pointer;padding:4px 10px;border-radius:20px;background:#c0202f;color:#fff;font-size:10px;letter-spacing:2px;flex-shrink:0;}
+#live-indicador{display:none;align-items:center;justify-content:center;cursor:pointer;width:24px;height:24px;border-radius:50%;background:#c0202f;flex-shrink:0;}
 @keyframes titilar{0%,100%{opacity:1;}50%{opacity:.25;}}
-#live-indicador .dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:titilar 1.2s infinite;}
+#live-indicador .dot{width:10px;height:10px;border-radius:50%;background:#fff;animation:titilar 1.2s infinite;}
 #live-indicador.on{display:flex;}
 
 #msgs{flex:1;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:12px;}
@@ -191,9 +231,7 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
 </head>
 <body class="matrix">
 
-<div class="ceo-badge" id="ceo-badge" style="display:none;">
-  <div class="dot"></div> ∆° CABALLERO VIOLETA C.E.O.
-</div>
+
 
 <!-- LOGIN / REGISTRO -->
 <div id="login">
@@ -245,7 +283,7 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
     <button class="th-btn th-carta"  onclick="setTema('carta')">CARTA</button>
     <button class="th-btn th-papel"  onclick="setTema('papel')">PAPEL</button>
     <button class="th-btn th-violeta" onclick="setTema('violeta')">VIOLETA</button>
-    <button class="th-btn th-venezolano" onclick="setTema('venezolano')">VENEZUELA</button>
+    <button class="th-btn th-notichat" onclick="setTema('notichat')">NOTICHAT</button>
     <button class="th-btn th-cristiano" onclick="setTema('cristiano')">CRISTIANO</button>
     <button class="th-btn th-gameboy" onclick="setTema('gameboy')">GAMEBOY</button>
   </div>
@@ -255,10 +293,14 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
 <div id="app-screen">
   <div id="chat-header">
     <div class="header-logo" onclick="abrirMenuPrincipal()">∆°</div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div id="live-indicador" onclick="entrarLive()"><div class="dot"></div>EN VIVO</div>
-      <div class="icon-btn" onclick="abrirNotificaciones()">🔔<span id="notif-badge" style="font-size:9px;"></span></div>
-      <div class="icon-btn" onclick="abrirDMBandeja()">✉</div>
+    <div id="banner-wrap" onclick="abrirBannerCompleto()">
+      <div id="banner-dots"></div>
+      <div id="banner-marquee-track"><span id="banner-texto-marquee">· · ·</span></div>
+    </div>
+    <div class="header-icons-col">
+      <div class="icon-btn" onclick="abrirNotificaciones()">🔔<span id="notif-badge" style="font-size:11px;"></span></div>
+      <div class="icon-btn" onclick="abrirDMBandeja()">✉️</div>
+      <div id="live-indicador" onclick="entrarLive()"><div class="dot"></div></div>
     </div>
   </div>
 
@@ -281,6 +323,7 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
 <!-- MENÚ PRINCIPAL ∆° -->
 <div class="overlay" id="menu-overlay" onclick="cerrarOverlay('menu-overlay')">
   <div class="card" onclick="event.stopPropagation()">
+    <div class="card-close-x"><span onclick="cerrarOverlay('menu-overlay')">✕</span></div>
     <div class="card-header">∆° MENÚ</div>
     <div class="card-item" onclick="verPerfil(U.nombre)">∆Perfil°</div>
     <div class="card-item" onclick="abrirContactos()">∆Contactos° (<span id="menu-contactos-count">0</span>/70)</div>
@@ -289,19 +332,51 @@ body.carta .card-item, body.cristiano .card-item{font-size:18px;}
     <div class="card-item" onclick="abrirRecordReferidos()">∆Record-Referidos°</div>
     <div class="card-item" onclick="abrirNotificaciones()">∆Notificación°</div>
     <div class="card-item" onclick="abrirEcosistema()">∆Ecosistema°</div>
+    <div class="card-item" id="menu-banner" style="display:none;color:#a855f7;" onclick="abrirEditorBanner()">∆Banner°</div>
     <div class="card-item" id="menu-transmision" style="display:none;color:#a855f7;" onclick="abrirCentroMando()">∆Transmisión°</div>
     <div class="card-item" id="menu-crear-link-mod" style="display:none;" onclick="crearLinkModerador()">🛡 Sumar moderador de apoyo</div>
-    <div class="card-item" onclick="cerrarOverlay('menu-overlay');document.getElementById('menu-temas').classList.toggle('on')">🎨 Cambiar tema</div>
+    <div class="card-item" onclick="document.getElementById('menu-temas').classList.toggle('on')">🎨 Cambiar tema</div>
     <div id="menu-temas" class="theme-row" style="padding:10px 16px;">
       <button class="th-btn th-matrix" onclick="setTema('matrix')">MATRIX</button>
       <button class="th-btn th-carta"  onclick="setTema('carta')">CARTA</button>
       <button class="th-btn th-papel"  onclick="setTema('papel')">PAPEL</button>
       <button class="th-btn th-violeta" onclick="setTema('violeta')">VIOLETA</button>
-      <button class="th-btn th-venezolano" onclick="setTema('venezolano')">VENEZUELA</button>
+      <button class="th-btn th-notichat" onclick="setTema('notichat')">NOTICHAT</button>
       <button class="th-btn th-cristiano" onclick="setTema('cristiano')">CRISTIANO</button>
       <button class="th-btn th-gameboy" onclick="setTema('gameboy')">GAMEBOY</button>
     </div>
     <div class="card-item peligro" onclick="cerrarSesion()">⏻ Cerrar sesión</div>
+  </div>
+</div>
+
+<!-- BANNER: lectura completa -->
+<div class="overlay" id="banner-lectura-overlay" onclick="cerrarOverlay('banner-lectura-overlay')">
+  <div class="card" onclick="event.stopPropagation()">
+    <div class="card-close-x"><span onclick="cerrarOverlay('banner-lectura-overlay')">✕</span></div>
+    <div class="banner-lectura" id="banner-lectura-content"></div>
+  </div>
+</div>
+
+<!-- BANNER: editor (solo CEO) -->
+<div class="overlay" id="banner-editor-overlay" onclick="cerrarOverlay('banner-editor-overlay')">
+  <div class="card" onclick="event.stopPropagation()">
+    <div class="card-close-x"><span onclick="cerrarOverlay('banner-editor-overlay')">✕</span></div>
+    <div class="card-header" style="color:#a855f7;">∆Banner° — tema del día</div>
+    <div class="banner-form">
+      <textarea class="inp" id="banner-texto-input" rows="4" maxlength="777" placeholder="Pregunta o tema a tratar (máx 777 caracteres)"></textarea>
+      <div class="char-count"><span id="banner-char-count">0</span>/777</div>
+      <div>Color del banner:</div>
+      <div class="color-swatches">
+        <div class="color-swatch" style="background:#a855f7;" onclick="setColorBanner('#a855f7')"></div>
+        <div class="color-swatch" style="background:#00ff41;" onclick="setColorBanner('#00ff41')"></div>
+        <div class="color-swatch" style="background:#ff4b3e;" onclick="setColorBanner('#ff4b3e')"></div>
+        <div class="color-swatch" style="background:#ffe066;" onclick="setColorBanner('#ffe066')"></div>
+        <div class="color-swatch" style="background:#38bdf8;" onclick="setColorBanner('#38bdf8')"></div>
+      </div>
+      <label class="btn secundario" style="cursor:pointer;">Cargar imagen de apoyo (cuadrada)<input type="file" id="banner-img-apoyo-input" accept="image/*" style="display:none;" onchange="previsualizarBannerApoyo()"></label>
+      <img id="banner-apoyo-preview" style="max-width:120px;border-radius:6px;display:none;">
+      <button class="btn" onclick="guardarBanner()">Publicar en el banner</button>
+    </div>
   </div>
 </div>
 
@@ -572,7 +647,7 @@ async function iniciarSesion(){
 async function entrarApp(){
   document.getElementById('login').style.display='none';
   document.getElementById('app-screen').style.display='flex';
-  document.getElementById('ceo-badge').style.display='flex';
+  document.getElementById('menu-banner').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
   document.getElementById('menu-transmision').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
   document.getElementById('menu-crear-link-mod').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
 
@@ -580,6 +655,7 @@ async function entrarApp(){
   await cambiarSala(salaMasAltaDesbloqueada());
   actualizarBadgeContactos();
   actualizarBadgeNotificaciones();
+  cargarBanner(); setInterval(cargarBanner, 30000);
 
   pollEstadoLive(); livePollTid = setInterval(pollEstadoLive, 5000);
   actividadTid = setInterval(marcarActividad, 60000);
@@ -699,6 +775,30 @@ async function agregarMensajeDOM(id,usuario,texto,creado_en){
   msgsEl.appendChild(div);
   actualizarUnTemporizador(div.querySelector('.msg-caduca'));
   if(typeof id === 'number') cargarReacciones(id);
+  if(U.rol==='centro_mando' && typeof id==='number') activarBorrarLargoPresion(div, id);
+}
+
+/* ── El C.E.O. puede borrar cualquier publicación manteniéndola presionada ── */
+function activarBorrarLargoPresion(div, mensajeId){
+  var burbuja = div.querySelector('.msg-burbuja');
+  if(!burbuja) return;
+  var tid = null;
+  var iniciar = function(){ tid = setTimeout(function(){ confirmarBorrarPublicacion(mensajeId, div); }, 550); };
+  var cancelar = function(){ clearTimeout(tid); };
+  burbuja.addEventListener('touchstart', iniciar);
+  burbuja.addEventListener('touchend', cancelar);
+  burbuja.addEventListener('touchmove', cancelar);
+  burbuja.addEventListener('mousedown', iniciar);
+  burbuja.addEventListener('mouseup', cancelar);
+  burbuja.addEventListener('mouseleave', cancelar);
+  burbuja.style.cursor = 'pointer';
+}
+async function confirmarBorrarPublicacion(mensajeId, div){
+  if(!confirm('¿Eliminar esta publicación? (acción del Centro de Mando, no se puede deshacer)')) return;
+  try{
+    await sb.from('pc_mensajes').delete().eq('id',mensajeId);
+    div.remove();
+  }catch(x){ alert('Error al eliminar la publicación'); }
 }
 
 function verFotoAmpliada(url, nombre){
@@ -856,6 +956,72 @@ function abrirMenuPrincipal(){
   actualizarBadgeContactos();
   document.getElementById('menu-overlay').classList.add('on');
 }
+
+/* ── ∆Banner° ── */
+var BANNER_ACTUAL = null;
+async function cargarBanner(){
+  try{
+    var {data} = await sb.from('pc_banner').select('*').eq('id',1).maybeSingle();
+    BANNER_ACTUAL = data;
+    var texto = (data && data.texto) ? data.texto : 'P∆pir°Chat — el tema del día aparecerá aquí';
+    var color = (data && data.color) ? data.color : '#a855f7';
+    var track = document.getElementById('banner-texto-marquee');
+    track.textContent = texto;
+    track.style.color = color;
+    track.style.textShadow = '0 0 6px '+color;
+    document.getElementById('banner-wrap').style.borderColor = color;
+    document.getElementById('banner-wrap').style.background =
+      'radial-gradient(circle, '+color+' 1.1px, transparent 1.3px) 0 0/8px 8px, #0b0b0b';
+    // velocidad de lectura cómoda: más texto = animación más larga (no más rápida)
+    var duracionSeg = Math.max(10, texto.length * 0.18);
+    track.style.animationDuration = duracionSeg + 's';
+  }catch(x){}
+}
+function abrirBannerCompleto(){
+  var d = BANNER_ACTUAL;
+  var cont = document.getElementById('banner-lectura-content');
+  var texto = (d && d.texto) ? d.texto : 'Aún no se ha publicado un tema.';
+  cont.innerHTML =
+    (d && d.imagen_apoyo ? '<img class="apoyo" src="'+d.imagen_apoyo+'" onclick="verFotoAmpliada(\''+d.imagen_apoyo+'\',null)">' : '') +
+    '<div class="texto-completo">'+escHtml(texto)+'</div>';
+  document.getElementById('banner-lectura-overlay').classList.add('on');
+}
+function abrirEditorBanner(){
+  cerrarOverlay('menu-overlay');
+  var d = BANNER_ACTUAL;
+  document.getElementById('banner-texto-input').value = (d && d.texto) ? d.texto : '';
+  document.getElementById('banner-char-count').textContent = document.getElementById('banner-texto-input').value.length;
+  document.getElementById('banner-texto-input').oninput = function(){ document.getElementById('banner-char-count').textContent = this.value.length; };
+  if(d && d.imagen_apoyo){ document.getElementById('banner-apoyo-preview').src = d.imagen_apoyo; document.getElementById('banner-apoyo-preview').style.display='block'; }
+  COLOR_BANNER_NUEVO = (d && d.color) ? d.color : '#a855f7';
+  document.getElementById('banner-editor-overlay').classList.add('on');
+}
+var COLOR_BANNER_NUEVO = '#a855f7';
+var IMG_APOYO_BASE64 = null;
+function setColorBanner(c){ COLOR_BANNER_NUEVO = c; }
+function previsualizarBannerApoyo(){
+  var file = document.getElementById('banner-img-apoyo-input').files[0];
+  if(!file) return;
+  if(file.size > 900*1024){ alert('Imagen muy pesada, usa una de menos de 900KB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    IMG_APOYO_BASE64 = e.target.result;
+    var prev = document.getElementById('banner-apoyo-preview');
+    prev.src = IMG_APOYO_BASE64; prev.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+async function guardarBanner(){
+  var texto = document.getElementById('banner-texto-input').value.trim().slice(0,777);
+  try{
+    var update = { texto:texto||null, color:COLOR_BANNER_NUEVO, actualizado_en:new Date().toISOString() };
+    if(IMG_APOYO_BASE64) update.imagen_apoyo = IMG_APOYO_BASE64;
+    await sb.from('pc_banner').update(update).eq('id',1);
+    cerrarOverlay('banner-editor-overlay');
+    cargarBanner();
+  }catch(x){ alert('Error al guardar el banner'); }
+}
+
 async function actualizarBadgeContactos(){
   try{
     var {count} = await sb.from('pc_contactos').select('*',{count:'exact',head:true}).eq('dueno',U.nombre);
@@ -1252,6 +1418,25 @@ async function pedirTokenLive(rol, passHashVerif){
   return resp.json();
 }
 var iniciandoLive = false;
+var liveLatidoTid = null;
+
+function attachVideoResiliente(track){
+  // Reutiliza SIEMPRE el mismo elemento <video> en vez de crear y borrar uno
+  // nuevo cada vez que llega un evento de track. Antes se borraba cualquier
+  // <video> existente en cada TrackSubscribed, lo que podía dejar la pantalla
+  // en negro si el navegador republicaba la pista (frecuente en móvil al
+  // cambiar de orientación o al haber una reconexión breve de red).
+  var wrap = document.getElementById('live-video-wrap');
+  var video = document.getElementById('live-video-el');
+  if(!video){
+    video = document.createElement('video');
+    video.id = 'live-video-el';
+    video.autoplay = true; video.playsInline = true;
+    wrap.appendChild(video);
+  }
+  track.attach(video);
+}
+
 async function iniciarLive(tipo){
   if(iniciandoLive) return;
   cerrarOverlay('centro-mando-overlay');
@@ -1262,12 +1447,27 @@ async function iniciarLive(tipo){
     var passHashVerif = await hashPass(passIngresada);
     var {token,url} = await pedirTokenLive('broadcaster', passHashVerif);
     liveRoom = new LivekitClient.Room();
+
+    // Vista previa: el propio CEO ahora SÍ ve su cámara/pantalla mientras transmite.
+    liveRoom.on(LivekitClient.RoomEvent.LocalTrackPublished, function(pub){
+      if(pub.track && pub.track.kind==='video'){ attachVideoResiliente(pub.track); }
+    });
+
     await liveRoom.connect(url, token);
     esBroadcaster = true;
     if(tipo==='camara'){ await liveRoom.localParticipant.setCameraEnabled(true); await liveRoom.localParticipant.setMicrophoneEnabled(true); }
     else if(tipo==='pantalla'){ await liveRoom.localParticipant.setScreenShareEnabled(true); await liveRoom.localParticipant.setMicrophoneEnabled(true); }
     else if(tipo==='audio'){ await liveRoom.localParticipant.setMicrophoneEnabled(true); }
-    await sb.from('pc_live_estado').update({activo:true, tipo:tipo, iniciado_en:new Date().toISOString()}).eq('id',1);
+
+    await sb.from('pc_live_estado').update({activo:true, tipo:tipo, iniciado_en:new Date().toISOString(), ultimo_latido:new Date().toISOString()}).eq('id',1);
+    // Latido de vida cada 15s: si el CEO se desconecta sin avisar (se le cae
+    // la señal, cierra el navegador de golpe, etc.), este latido deja de
+    // llegar y los espectadores dejan de ver el EN VIVO automáticamente.
+    clearInterval(liveLatidoTid);
+    liveLatidoTid = setInterval(function(){
+      sb.from('pc_live_estado').update({ultimo_latido:new Date().toISOString()}).eq('id',1).catch(()=>{});
+    }, 15000);
+
     abrirPantallaLive(tipo, true);
   }catch(x){
     alert('No se pudo iniciar el directo: '+x.message+'\n\nRevisa: 1) que desactivaste "Enforce JWT Verification" en la Edge Function, 2) que los 5 secretos estén bien escritos, 3) que diste permiso de cámara/micrófono al navegador.');
@@ -1278,18 +1478,26 @@ async function iniciarLive(tipo){
 }
 async function finalizarLive(){
   cerrarOverlay('centro-mando-overlay');
+  clearInterval(liveLatidoTid);
   try{ if(liveRoom){ await liveRoom.disconnect(); } }catch(x){}
   liveRoom = null; esBroadcaster = false;
-  try{ await sb.from('pc_live_estado').update({activo:false, tipo:null}).eq('id',1); }catch(x){}
+  try{ await sb.from('pc_live_estado').update({activo:false, tipo:null, ultimo_latido:null}).eq('id',1); }catch(x){}
   try{ await sb.from('pc_live_chat').delete().neq('id',0); }catch(x){}
+  var videoEl = document.getElementById('live-video-el'); if(videoEl) videoEl.remove();
   document.getElementById('live-view').classList.remove('on');
   document.getElementById('live-indicador').classList.remove('on');
 }
 async function pollEstadoLive(){
   try{
-    var {data} = await sb.from('pc_live_estado').select('activo,tipo').eq('id',1).maybeSingle();
+    var {data} = await sb.from('pc_live_estado').select('activo,tipo,ultimo_latido').eq('id',1).maybeSingle();
     var ind = document.getElementById('live-indicador');
-    if(data && data.activo){ ind.classList.add('on'); } else { ind.classList.remove('on'); }
+    // El indicador solo se enciende si activo=true Y el último latido llegó
+    // hace menos de 30 segundos. Esto arregla de raíz el bug de "se queda
+    // pegado EN VIVO para siempre": si el latido deja de llegar (por
+    // cualquier motivo — no solo por presionar Finalizar), se apaga solo.
+    var latidoReciente = data && data.ultimo_latido && (Date.now() - new Date(data.ultimo_latido).getTime()) < 30000;
+    if(data && data.activo && latidoReciente){ ind.classList.add('on'); }
+    else { ind.classList.remove('on'); if(document.getElementById('live-view').classList.contains('on') && !esBroadcaster) salirDeLive(); }
   }catch(x){}
 }
 async function entrarLive(){
@@ -1304,12 +1512,14 @@ async function entrarLive(){
     var {token,url} = await pedirTokenLive('viewer');
     liveRoom = new LivekitClient.Room();
     liveRoom.on(LivekitClient.RoomEvent.TrackSubscribed, function(track){
-      if(track.kind==='video'){
-        var el = track.attach();
-        var wrap = document.getElementById('live-video-wrap');
-        wrap.querySelectorAll('video').forEach(v=>v.remove());
-        wrap.appendChild(el);
-      } else if(track.kind==='audio'){ track.attach(); }
+      if(track.kind==='video'){ attachVideoResiliente(track); }
+      else if(track.kind==='audio'){ track.attach(); }
+    });
+    liveRoom.on(LivekitClient.RoomEvent.TrackUnsubscribed, function(track){
+      track.detach();
+    });
+    liveRoom.on(LivekitClient.RoomEvent.Disconnected, function(){
+      document.getElementById('live-view').classList.remove('on');
     });
     await liveRoom.connect(url, token);
     abrirPantallaLive(estado.tipo, false);
@@ -1362,10 +1572,13 @@ async function enviarLiveChat(){
 /* ── OVERLAYS Y SESIÓN ── */
 function cerrarOverlay(id){ document.getElementById(id).classList.remove('on'); }
 function cerrarSesion(){
-  clearInterval(pollTid); clearInterval(livePollTid); clearInterval(actividadTid); clearInterval(cleanupTid);
+  clearInterval(pollTid); clearInterval(livePollTid); clearInterval(actividadTid); clearInterval(cleanupTid); clearInterval(liveLatidoTid);
+  // Cierra cualquier ventana/panel que haya quedado abierto
+  document.querySelectorAll('.overlay').forEach(function(ov){ ov.classList.remove('on'); });
+  document.getElementById('live-view').classList.remove('on');
+  if(liveRoom){ try{ liveRoom.disconnect(); }catch(x){} liveRoom=null; }
   sessionStorage.removeItem('pc_nombre');
   document.getElementById('app-screen').style.display='none';
-  document.getElementById('ceo-badge').style.display='none';
   document.getElementById('login').style.display='flex';
   mostrarLogin();
 }
