@@ -1835,4 +1835,14 @@ function escHtml(txt){
 (function(){
   var guardado = sessionStorage.getItem('pc_nombre');
   if(guardado){
-    sb.from('pc_usuarios').select('nombre,rol,estado').ilike('
+    sb.from('pc_usuarios').select('nombre,rol,estado').ilike('nombre',guardado).maybeSingle().then(function(r){
+      if(r.data && r.data.estado!=='eliminado' && r.data.estado!=='expulsado_perm' && r.data.estado!=='caducada_inasistencia'){
+        U.nombre = r.data.nombre; U.rol = r.data.rol;
+        entrarApp();
+      }
+    });
+  }
+})();
+</script>
+</body>
+</
