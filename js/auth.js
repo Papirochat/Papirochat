@@ -15,33 +15,34 @@ async function registrar(){
   if(pass.length<6){ err.textContent='Contraseña mínimo 6 caracteres'; return; }
   if(pass!==pass2){ err.textContent='Las dos contraseñas no coinciden'; return; }
   if(filo.length>777){ err.textContent='La filosofía no puede pasar de 777 caracteres'; return; }
-  
+
   err.textContent='Verificando disponibilidad...';
   var passHash = await hashPass(pass);
 
+  /* ── Comprobación temprana (antes de intentar crear nada) ──
+     Si el nombre ya existe Y la contraseña coincide con la que ya está
+     guardada, es casi seguro que este es TU propio registro de un
+     intento anterior que se cortó por mala señal — entonces te deja
+     entrar directo en vez de decirte "ya existe" sin más explicación.
+     Si el nombre existe pero la contraseña NO coincide, es de alguien
+     más y se informa con claridad, sin dar pistas de cuál es la
+     contraseña correcta. */
   try{
-    // 1. Verificación inicial de disponibilidad
-    var {data:existente} = await sb.from('pc_usuarios').select('nombre, pass_hash').ilike('nombre',nombre).maybeSingle();
-    
+    var {data:existente} = await sb.from('pc_usuarios').select('nombre,pass_hash,rol').ilike('nombre',nombre).maybeSingle();
+
     if(existente){
-      // ARREGLO DE SEGURIDAD: Si el nombre existe, verificamos si es del mismo usuario (por fallo de red previo)
-      if(existente.pass_hash === passHash) {
-        // Es el mismo usuario, lo dejamos entrar directamente
+      if(existente.pass_hash === passHash){
         err.textContent='';
         U.nombre = existente.nombre;
-        var {data:userFull} = await sb.from('pc_usuarios').select('rol').ilike('nombre',U.nombre).single();
-        U.rol = userFull.rol;
+        U.rol = existente.rol;
         sessionStorage.setItem('pc_nombre', U.nombre);
         entrarApp();
         return;
-      } else {
-        err.textContent='Ese nombre ya está en uso por otra persona.';
-        return;
       }
+      err.textContent='Ese nombre ya está en uso por otra persona.';
+      return;
     }
-  }catch(x){
-    console.warn('Fallo en verificación previa, intentando inserción directa...');
-  }
+  }catch(x){}
 
   err.textContent='Creando cuenta...';
   var rol = esCEO(nombre) ? 'centro_mando' : 'usuario';
@@ -58,24 +59,23 @@ async function registrar(){
     });
 
     if(error){
-      // Si el error es por duplicado, aplicamos la validación de seguridad de nuevo
-      if(error.message.includes('duplicate')) {
-        var {data:reverif} = await sb.from('pc_usuarios').select('nombre, pass_hash').ilike('nombre',nombre).maybeSingle();
-        if(reverif && reverif.pass_hash === passHash) {
+      // Misma lógica de rescate si el error es "nombre duplicado": puede
+      // que tu propio intento anterior sí se haya guardado en el servidor.
+      if(error.message.includes('duplicate')){
+        var {data:reverif} = await sb.from('pc_usuarios').select('nombre,pass_hash,rol').ilike('nombre',nombre).maybeSingle();
+        if(reverif && reverif.pass_hash === passHash){
           err.textContent='';
           U.nombre = reverif.nombre;
-          var {data:userFull2} = await sb.from('pc_usuarios').select('rol').ilike('nombre',U.nombre).single();
-          U.rol = userFull2.rol;
+          U.rol = reverif.rol;
           sessionStorage.setItem('pc_nombre', U.nombre);
           entrarApp();
           return;
-        } else {
-          err.textContent = 'Ese nombre ya está en uso.';
-          return;
         }
+        err.textContent='Ese nombre ya está en uso.';
+        return;
       }
-      err.textContent = 'Error: ' + error.message; 
-      return; 
+      err.textContent = 'Error: ' + error.message;
+      return;
     }
 
     if(referido){
@@ -83,13 +83,14 @@ async function registrar(){
       await sb.rpc('pc_recalcular_referidos', {p_nombre:referido}).catch(()=>{});
       await sb.from('pc_notificaciones').insert({usuario_destino:referido, tipo:'sistema', contenido: nombre+' se registró usando tu invitación.'}).catch(()=>{});
     }
-    
+
     err.textContent='';
     U.nombre = nombre; U.rol = rol;
     sessionStorage.setItem('pc_nombre', nombre);
     mostrarNotaBienvenida();
-  }catch(x){ 
-    err.textContent='Error de conexión. Si crees que la cuenta se creó, intenta iniciar sesión.'; 
+
+  }catch(x){
+    err.textContent='Error de conexión. Si crees que la cuenta se creó, intenta iniciar sesión.';
   }
 }
 
@@ -124,56 +125,59 @@ async function iniciarSesion(){
   }catch(x){ err.textContent='Error de conexión'; }
 }
 
-/* ── ENTRAR A LA APP ── */
+/* ── ENTRAR A LA APP ──
+   Nota deliberada: aquí NO se usan guardas tipo "typeof función ===
+   'function'" antes de llamar a cada paso. Si algún archivo .js no
+   cargó bien o falta una función, es mejor que el error salga visible
+   en la consola del navegador (con el archivo y la línea exactos) que
+   quede escondido en silencio — así se puede diagnosticar rápido en
+   vez de que la app "funcione a medias" sin explicación. */
 async function entrarApp(){
   document.getElementById('login').style.display='none';
   document.getElementById('app-screen').style.display='flex';
-  
-  // Ajuste de visibilidad de menús según rol
-  if(document.getElementById('menu-banner')) document.getElementById('menu-banner').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
-  if(document.getElementById('menu-transmision')) document.getElementById('menu-transmision').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
-  if(document.getElementById('menu-crear-link-mod')) document.getElementById('menu-crear-link-mod').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
 
-  // Carga de datos iniciales
-  if(typeof actualizarTotalUsuarios === 'function') await actualizarTotalUsuarios();
-  if(typeof salaMasAltaDesbloqueada === 'function') await cambiarSala(salaMasAltaDesbloqueada());
-  if(typeof actualizarBadgeContactos === 'function') actualizarBadgeContactos();
-  if(typeof actualizarBadgeNotificaciones === 'function') actualizarBadgeNotificaciones();
-  if(typeof cargarBanner === 'function') { cargarBanner(); setInterval(cargarBanner, 30000); }
+  document.getElementById('menu-banner').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
+  document.getElementById('menu-transmision').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
+  document.getElementById('menu-crear-link-mod').style.display = (U.rol==='centro_mando') ? 'flex' : 'none';
 
-  // Procesos de fondo
-  if(typeof pollEstadoLive === 'function') { pollEstadoLive(); if(typeof livePollTid !== 'undefined') livePollTid = setInterval(pollEstadoLive, 5000); }
-  
-  // Actividad y Limpieza
-  setInterval(marcarActividad, 60000);
-  setInterval(limpiarCuentasInactivas, 120000);
-  limpiarCuentasInactivas(); 
+  await actualizarTotalUsuarios();
+  await cambiarSala(salaMasAltaDesbloqueada());
+
+  actualizarBadgeContactos();
+  actualizarBadgeNotificaciones();
+
+  cargarBanner(); setInterval(cargarBanner, 30000);
+
+  pollEstadoLive(); livePollTid = setInterval(pollEstadoLive, 5000);
+
+  actividadTid = setInterval(marcarActividad, 60000);
+  cleanupTid = setInterval(limpiarCuentasInactivas, 120000);
+  limpiarCuentasInactivas(); // corre una vez al entrar también
 }
 
 async function marcarActividad(){
   try{ await sb.from('pc_usuarios').update({ultima_actividad:new Date().toISOString()}).ilike('nombre',U.nombre); }catch(x){}
 }
 
-/* ── CADUCIDAD POR INASISTENCIA (96h → marcar, +72h → borrar de verdad) ── */
+/* ── CADUCIDAD POR INASISTENCIA (96h → marcar, +72h → borrar de verdad) ──
+   Se dispara desde los clientes conectados. ∆luisalfonsocastillejo° tiene
+   inmunidad total: jamás se marca, jamás se borra. */
 async function limpiarCuentasInactivas(){
   try{
     var corte96 = new Date(Date.now() - 96*3600*1000).toISOString();
     var {data:inactivos} = await sb.from('pc_usuarios').select('nombre').lt('ultima_actividad',corte96).eq('estado','activo');
+
     for(var i=0;i<(inactivos||[]).length;i++){
-      if(typeof esCEO === 'function' && esCEO(inactivos[i].nombre)) continue; 
+      if(esCEO(inactivos[i].nombre)) continue; // inmunidad total
       await sb.from('pc_usuarios').update({estado:'caducada_inasistencia', caducada_en:new Date().toISOString()}).eq('nombre',inactivos[i].nombre);
     }
+
     var corte72 = new Date(Date.now() - 72*3600*1000).toISOString();
     var {data:paraBorrar} = await sb.from('pc_usuarios').select('nombre').eq('estado','caducada_inasistencia').lt('caducada_en',corte72);
+
     for(var j=0;j<(paraBorrar||[]).length;j++){
-      if(typeof esCEO === 'function' && esCEO(paraBorrar[j].nombre)) continue;
+      if(esCEO(paraBorrar[j].nombre)) continue;
       await sb.from('pc_usuarios').delete().eq('nombre',paraBorrar[j].nombre);
     }
   }catch(x){}
 }
-
-/* ── FUNCIÓN PARA ABRIR SEÑA CROMÁTICA DESDE EL MENÚ ── */
-function abrirSeñaCromatica(){
-  // Corregido: Apunta a sng.html como pidió el usuario
-  window.location.href = 'sng.html?modo=registro&usuario=' + encodeURIComponent(U.nombre);
-    }
