@@ -1,5 +1,6 @@
 'use strict';
-/* ── MENÚ PRINCIPAL ∆° ── */
+
+/* ══ MENÚ PRINCIPAL ∆° ══ */
 function abrirMenuPrincipal(){
   actualizarBadgeContactos();
   document.getElementById('menu-overlay').classList.add('on');
@@ -20,7 +21,7 @@ function pintarPildoras(contenedorId, opciones, valorActivo, onElegir){
   });
 }
 
-/* ── ∆Banner° ── */
+/* ══ ∆Banner° ══ */
 var BANNER_ACTUAL = null;
 var PALETA_BANNER = ['#a855f7','#00ff41','#ff4b3e','#ffe066','#38bdf8','#ffffff','#000000'];
 
@@ -38,7 +39,6 @@ async function cargarBanner(){
     var texto = (data && data.texto) ? data.texto : 'P∆pir°Chat — el tema del día aparecerá aquí';
     var colorTexto = colorTextoEfectivo(data);
     var colorCaja = colorCajaEfectivo(data);
-
     var track = document.getElementById('banner-texto-marquee');
     track.textContent = texto;
     track.style.color = colorTexto;
@@ -50,7 +50,6 @@ async function cargarBanner(){
     var multiplicador = VELOCIDADES_BANNER[(data && data.velocidad) || 'normal'];
     var duracionSeg = Math.max(6, texto.length * 0.18 * multiplicador); // más texto = animación más larga, no más rápida
     track.style.animationDuration = duracionSeg + 's';
-
     var mini = document.getElementById('banner-apoyo-mini');
     if(data && data.imagen_apoyo){ mini.src = data.imagen_apoyo; mini.style.display='block'; }
     else { mini.style.display='none'; }
@@ -66,6 +65,7 @@ function abrirBannerCompleto(){
     '<div class="texto-completo">'+escHtml(texto)+'</div>';
   document.getElementById('banner-lectura-overlay').classList.add('on');
 }
+
 function abrirImagenApoyo(){
   var d = BANNER_ACTUAL;
   if(!d || !d.imagen_apoyo) return;
@@ -74,7 +74,7 @@ function abrirImagenApoyo(){
   document.getElementById('banner-imagen-overlay').classList.add('on');
 }
 
-/* ── Construcción de paletas con palomita de confirmación ── */
+/* ══ Construcción de paletas con palomita de confirmación ══ */
 function pintarPaleta(contenedorId, colorActivo, onElegir){
   var cont = document.getElementById(contenedorId);
   cont.innerHTML = '';
@@ -87,10 +87,12 @@ function pintarPaleta(contenedorId, colorActivo, onElegir){
   });
 }
 
-/* ── Editor completo del CEO (texto + ambos colores) ── */
+/* ══ Editor completo del CEO (texto + ambos colores) ══ */
 var COLOR_TEXTO_NUEVO = '#a855f7';
 var COLOR_CAJA_NUEVO = '#a855f7';
 var IMG_APOYO_BASE64 = null;
+var TAMANO_NUEVO = 'pequena';
+var VELOCIDAD_NUEVA = 'normal';
 
 function abrirEditorBanner(){
   cerrarOverlay('menu-overlay');
@@ -100,7 +102,6 @@ function abrirEditorBanner(){
   document.getElementById('banner-texto-input').oninput = function(){ document.getElementById('banner-char-count').textContent = this.value.length; };
   if(d && d.imagen_apoyo){ document.getElementById('banner-apoyo-preview').src = d.imagen_apoyo; document.getElementById('banner-apoyo-preview').style.display='block'; }
   IMG_APOYO_BASE64 = null;
-
   COLOR_TEXTO_NUEVO = (d && d.color) ? d.color : '#a855f7';
   COLOR_CAJA_NUEVO = (d && d.color_caja) ? d.color_caja : COLOR_TEXTO_NUEVO;
   TAMANO_NUEVO = (d && d.tamano_letra) || 'pequena';
@@ -108,14 +109,14 @@ function abrirEditorBanner(){
   redibujarPaletasEditorCEO();
   document.getElementById('banner-editor-overlay').classList.add('on');
 }
-var TAMANO_NUEVO = 'pequena';
-var VELOCIDAD_NUEVA = 'normal';
+
 function redibujarPaletasEditorCEO(){
   pintarPaleta('swatches-texto', COLOR_TEXTO_NUEVO, function(c){ COLOR_TEXTO_NUEVO=c; redibujarPaletasEditorCEO(); });
   pintarPaleta('swatches-caja', COLOR_CAJA_NUEVO, function(c){ COLOR_CAJA_NUEVO=c; redibujarPaletasEditorCEO(); });
   pintarPildoras('opciones-tamano', {pequena:'Pequeña',mediana:'Mediana',grande:'Grande'}, TAMANO_NUEVO, function(v){ TAMANO_NUEVO=v; redibujarPaletasEditorCEO(); });
   pintarPildoras('opciones-velocidad', {baja:'Baja',normal:'Normal',alta:'Alta'}, VELOCIDAD_NUEVA, function(v){ VELOCIDAD_NUEVA=v; redibujarPaletasEditorCEO(); });
 }
+
 async function previsualizarBannerApoyo(){
   var file = document.getElementById('banner-img-apoyo-input').files[0];
   if(!file) return;
@@ -125,6 +126,7 @@ async function previsualizarBannerApoyo(){
     prev.src = IMG_APOYO_BASE64; prev.style.display='block';
   }catch(x){ alert('No se pudo procesar la imagen. Prueba con otra.'); }
 }
+
 async function guardarBanner(){
   var texto = document.getElementById('banner-texto-input').value.trim().slice(0,777);
   try{
@@ -137,9 +139,10 @@ async function guardarBanner(){
   }catch(x){ alert('Error al guardar el banner'); }
 }
 
-/* ── ∆Banner-Color°: cualquier usuario personaliza SOLO los colores que ve ── */
+/* ══ ∆Banner-Color°: cualquier usuario personaliza SOLO los colores que ve ══ */
 var COLOR_TEXTO_USER_TEMP = '#a855f7';
 var COLOR_CAJA_USER_TEMP = '#a855f7';
+
 function abrirEditorColorBanner(){
   cerrarOverlay('menu-overlay');
   var d = BANNER_ACTUAL;
@@ -148,10 +151,12 @@ function abrirEditorColorBanner(){
   redibujarPaletasEditorUsuario();
   document.getElementById('banner-color-overlay').classList.add('on');
 }
+
 function redibujarPaletasEditorUsuario(){
   pintarPaleta('swatches-texto-user', COLOR_TEXTO_USER_TEMP, function(c){ COLOR_TEXTO_USER_TEMP=c; redibujarPaletasEditorUsuario(); });
   pintarPaleta('swatches-caja-user', COLOR_CAJA_USER_TEMP, function(c){ COLOR_CAJA_USER_TEMP=c; redibujarPaletasEditorUsuario(); });
 }
+
 function guardarColorPersonalBanner(){
   localStorage.setItem('pc_banner_color_texto', COLOR_TEXTO_USER_TEMP);
   localStorage.setItem('pc_banner_color_caja', COLOR_CAJA_USER_TEMP);
@@ -159,6 +164,7 @@ function guardarColorPersonalBanner(){
   cargarBanner();
   alert('Listo — así se ve tu banner ahora. Solo en tu dispositivo.');
 }
+
 function restablecerColorBanner(){
   localStorage.removeItem('pc_banner_color_texto');
   localStorage.removeItem('pc_banner_color_caja');
@@ -172,16 +178,22 @@ async function actualizarBadgeContactos(){
     document.getElementById('menu-contactos-count').textContent = count||0;
   }catch(x){}
 }
+
+/* ══ ARREGLO: la campanita ahora cuenta solo lo NO LEÍDO ══
+   Antes contaba todas las notificaciones del usuario, aunque ya las
+   hubiera visto. Ahora cuenta únicamente las que tienen leido = false,
+   así que el número desaparece en cuanto entras a ∆Notificación°
+   (ver notificaciones-dm.js, función abrirNotificaciones). */
 async function actualizarBadgeNotificaciones(){
   try{
     await limpiarNotificacionesExpiradas();
-    var {count} = await sb.from('pc_notificaciones').select('*',{count:'exact',head:true}).eq('usuario_destino',U.nombre);
+    var {count} = await sb.from('pc_notificaciones').select('*',{count:'exact',head:true}).eq('usuario_destino',U.nombre).eq('leido',false);
     document.getElementById('notif-badge').textContent = count>0 ? (' '+count) : '';
   }catch(x){}
 }
 setInterval(actualizarBadgeNotificaciones, 20000);
 
-/* ── EDITAR BITCHAT / BRIAR (sin restricción de tiempo, cada quien el suyo) ── */
+/* ══ EDITAR BITCHAT / BRIAR (sin restricción de tiempo, cada quien el suyo) ══ */
 async function editarCodigo(campo, etiqueta){
   cerrarOverlay('menu-overlay');
   var nuevo = prompt('Nuevo '+etiqueta+':');
@@ -190,3 +202,12 @@ async function editarCodigo(campo, etiqueta){
   try{ await sb.from('pc_usuarios').update(update).ilike('nombre',U.nombre); alert('Actualizado.'); }catch(x){ alert('Error al actualizar'); }
 }
 
+/* ══ ∆Seña-Cromática°: acceso directo desde el menú, sin esperar el sobre ══
+   Abre sng.html en modo "registro" para que cualquier usuario pueda
+   crear o reemplazar su seña cuando quiera. IMPORTANTE: el archivo se
+   llama exactamente "sng.html" — si alguna vez otra IA te sugiere un
+   nombre distinto, no le hagas caso, ese es el nombre real. */
+function abrirSenaCromatica(){
+  cerrarOverlay('menu-overlay');
+  location.href = 'sng.html?modo=registro&usuario='+encodeURIComponent(U.nombre);
+}
