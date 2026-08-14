@@ -8,273 +8,243 @@
 <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body class="matrix">
-
-
-
 <!-- LOGIN / REGISTRO -->
 <div id="login">
-  <div class="logo-txt">P∆pir°</div>
-  <div class="tagline">SIN NÚMERO · SIN CORREO · DIGITALIDAD SANA</div>
-
-  <div id="form-login">
-    <input class="inp" id="li-user" placeholder="∆tunombre°" autocomplete="off" spellcheck="false"><br><br>
-    <div style="width:100%;max-width:300px;position:relative;margin:0 auto;">
-      <input class="inp" id="li-pass" type="password" placeholder="contraseña" style="padding-right:40px;">
-      <span onclick="toggleOjo('li-pass','ojo3')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo3">👁</span>
-    </div>
-    <div style="height:8px;"></div>
-    <button class="btn" onclick="iniciarSesion()">ENTRAR ∆°</button>
-    <div class="err-txt" id="login-err"></div>
-    <div style="text-align:center;"><span class="link-txt" onclick="mostrarRegistro()">Crear cuenta nueva</span></div>
-  </div>
-
-  <div id="form-registro" style="display:none;flex-direction:column;align-items:center;gap:10px;">
-    <input class="inp" id="rg-user" placeholder="elige tu nombre (sin @, sin espacios)" autocomplete="off" spellcheck="false">
-    <div style="width:100%;max-width:300px;position:relative;">
-      <input class="inp" id="rg-pass" type="password" placeholder="crea una contraseña (mín 6)" style="padding-right:40px;">
-      <span onclick="toggleOjo('rg-pass','ojo1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo1">👁</span>
-    </div>
-    <div style="width:100%;max-width:300px;position:relative;">
-      <input class="inp" id="rg-pass2" type="password" placeholder="repite la contraseña" style="padding-right:40px;">
-      <span onclick="toggleOjo('rg-pass2','ojo2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo2">👁</span>
-    </div>
-    <div style="width:100%;max-width:300px;text-align:left;font-size:9px;opacity:.5;letter-spacing:1px;">TODO LO SIGUIENTE ES OPCIONAL:</div>
-    <div style="display:flex;align-items:center;gap:10px;width:100%;max-width:300px;">
-      <img id="rg-img-preview" style="width:44px;height:44px;border-radius:50%;object-fit:cover;background:rgba(128,128,128,.2);flex-shrink:0;">
-      <label class="btn secundario" style="width:auto;padding:8px 12px;font-size:10px;margin:0;text-align:center;cursor:pointer;">
-        FOTO DE PERFIL
-        <input type="file" id="rg-img-input" accept="image/*" style="display:none;" onchange="previsualizarImagen()">
-      </label>
-    </div>
-    <input class="inp" id="rg-referido" placeholder="¿quién te invitó? ∆nombre° (opcional)">
-    <textarea class="inp" id="rg-filo" rows="3" maxlength="777" placeholder="tu filosofía o frase (opcional, máx 777 caracteres)" oninput="contarFilo()"></textarea>
-    <div class="char-count"><span id="filo-count">0</span>/777</div>
-    <input class="inp" id="rg-bitchat" placeholder="tu código Bitchat (opcional)">
-    <input class="inp" id="rg-briar" placeholder="tu código Briar (opcional)">
-    <button class="btn" onclick="registrar()">CREAR CUENTA</button>
-    <div class="err-txt" id="reg-err"></div>
-    <div><span class="link-txt" onclick="mostrarLogin()">Ya tengo cuenta</span></div>
-  </div>
-
-  <div class="theme-row">
-    <button class="th-btn th-matrix" onclick="setTema('matrix')">MATRIX</button>
-    <button class="th-btn th-carta"  onclick="setTema('carta')">CARTA</button>
-    <button class="th-btn th-papel"  onclick="setTema('papel')">PAPEL</button>
-    <button class="th-btn th-violeta" onclick="setTema('violeta')">VIOLETA</button>
-    <button class="th-btn th-notichat" onclick="setTema('notichat')">NOTICHAT</button>
-    <button class="th-btn th-cristiano" onclick="setTema('cristiano')">CRISTIANO</button>
-    <button class="th-btn th-gameboy" onclick="setTema('gameboy')">GAMEBOY</button>
-  </div>
+<div class="logo-txt">P∆pir°</div>
+<div class="tagline">SIN NÚMERO · SIN CORREO · DIGITALIDAD SANA</div>
+<div id="form-login">
+<input class="inp" id="li-user" placeholder="∆tunombre°" autocomplete="off" spellcheck="false"><br><br>
+<div style="width:100%;max-width:300px;position:relative;margin:0 auto;">
+<input class="inp" id="li-pass" type="password" placeholder="contraseña" style="padding-right:40px;">
+<span onclick="toggleOjo('li-pass','ojo3')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo3">👁</span>
 </div>
-
+<div style="height:8px;"></div>
+<button class="btn" onclick="iniciarSesion()">ENTRAR ∆°</button>
+<div class="err-txt" id="login-err"></div>
+<div style="text-align:center;"><span class="link-txt" onclick="mostrarRegistro()">Crear cuenta nueva</span></div>
+</div>
+<div id="form-registro" style="display:none;flex-direction:column;align-items:center;gap:10px;">
+<input class="inp" id="rg-user" placeholder="elige tu nombre (sin @, sin espacios)" autocomplete="off" spellcheck="false">
+<div style="width:100%;max-width:300px;position:relative;">
+<input class="inp" id="rg-pass" type="password" placeholder="crea una contraseña (mín 6)" style="padding-right:40px;">
+<span onclick="toggleOjo('rg-pass','ojo1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo1">👁</span>
+</div>
+<div style="width:100%;max-width:300px;position:relative;">
+<input class="inp" id="rg-pass2" type="password" placeholder="repite la contraseña" style="padding-right:40px;">
+<span onclick="toggleOjo('rg-pass2','ojo2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.6;" id="ojo2">👁</span>
+</div>
+<div style="width:100%;max-width:300px;text-align:left;font-size:9px;opacity:.5;letter-spacing:1px;">TODO LO SIGUIENTE ES OPCIONAL:</div>
+<div style="display:flex;align-items:center;gap:10px;width:100%;max-width:300px;">
+<img id="rg-img-preview" style="width:44px;height:44px;border-radius:50%;object-fit:cover;background:rgba(128,128,128,.2);flex-shrink:0;">
+<label class="btn secundario" style="width:auto;padding:8px 12px;font-size:10px;margin:0;text-align:center;cursor:pointer;">
+FOTO DE PERFIL
+<input type="file" id="rg-img-input" accept="image/*" style="display:none;" onchange="previsualizarImagen()">
+</label>
+</div>
+<input class="inp" id="rg-referido" placeholder="¿quién te invitó? ∆nombre° (opcional)">
+<textarea class="inp" id="rg-filo" rows="3" maxlength="777" placeholder="tu filosofía o frase (opcional, máx 777 caracteres)" oninput="contarFilo()"></textarea>
+<div class="char-count"><span id="filo-count">0</span>/777</div>
+<input class="inp" id="rg-bitchat" placeholder="tu código Bitchat (opcional)">
+<input class="inp" id="rg-briar" placeholder="tu código Briar (opcional)">
+<button class="btn" onclick="registrar()">CREAR CUENTA</button>
+<div class="err-txt" id="reg-err"></div>
+<div style="text-align:center;"><span class="link-txt" onclick="mostrarLogin()">Ya tengo cuenta</span></div>
+</div>
+<div class="theme-row">
+<button class="th-btn th-matrix" onclick="setTema('matrix')">MATRIX</button>
+<button class="th-btn th-carta" onclick="setTema('carta')">CARTA</button>
+<button class="th-btn th-papel" onclick="setTema('papel')">PAPEL</button>
+<button class="th-btn th-violeta" onclick="setTema('violeta')">VIOLETA</button>
+<button class="th-btn th-notichat" onclick="setTema('notichat')">NOTICHAT</button>
+<button class="th-btn th-cristiano" onclick="setTema('cristiano')">CRISTIANO</button>
+<button class="th-btn th-gameboy" onclick="setTema('gameboy')">GAMEBOY</button>
+</div>
+</div>
 <!-- APP -->
 <div id="app-screen">
-  <div id="chat-header">
-    <div class="header-left-col">
-      <div class="header-logo" onclick="abrirMenuPrincipal()">∆°</div>
-      <img id="banner-apoyo-mini" class="banner-apoyo-mini" src="" style="display:none;" onclick="abrirImagenApoyo()">
-    </div>
-    <div id="banner-wrap" onclick="abrirBannerCompleto()">
-      <div id="banner-dots"></div>
-      <div id="banner-marquee-track"><span id="banner-texto-marquee">· · ·</span></div>
-    </div>
-    <div class="header-icons-col">
-      <div class="icon-btn" onclick="abrirNotificaciones()">🔔<span id="notif-badge" style="font-size:11px;"></span></div>
-      <div class="icon-btn" onclick="abrirDMBandeja()">✉️</div>
-      <div id="live-indicador" onclick="entrarLive()"><div class="dot"></div></div>
-    </div>
-  </div>
-
-  <div class="sala-header-elegante">
-    <div class="cruz-decor">✝</div>
-    <div class="titulo" id="h-sala-titulo">· · ·</div>
-    <div class="meta" id="h-sala-meta"></div>
-    <div class="secreta" id="h-sala-secreta"></div>
-  </div>
-
-  <div id="msgs"></div>
-  <div id="wait-ind"></div>
-
-  <div id="input-row">
-    <textarea id="msg-input" rows="1" placeholder="escribe aquí..." onkeydown="keyEnter(event)"></textarea>
-    <button id="btn-send" onclick="enviar()">↑</button>
-  </div>
+<div id="chat-header">
+<div class="header-left-col">
+<div class="header-logo" onclick="abrirMenuPrincipal()">∆°</div>
+<img id="banner-apoyo-mini" class="banner-apoyo-mini" src="" style="display:none;" onclick="abrirImagenApoyo()">
 </div>
-
+<div id="banner-wrap" onclick="abrirBannerCompleto()">
+<div id="banner-dots"></div>
+<div id="banner-marquee-track"><span id="banner-texto-marquee">· · ·</span></div>
+</div>
+<div class="header-icons-col">
+<div class="icon-btn" onclick="abrirNotificaciones()">🔔<span id="notif-badge" style="font-size:11px;"></span></div>
+<div class="icon-btn" onclick="abrirDMBandeja()">✉️</div>
+<div id="live-indicador" onclick="entrarLive()"><div class="dot"></div></div>
+</div>
+</div>
+<div class="sala-header-elegante">
+<div class="cruz-decor">✝</div>
+<div class="titulo" id="h-sala-titulo">· · ·</div>
+<div class="meta" id="h-sala-meta"></div>
+<div class="secreta" id="h-sala-secreta"></div>
+</div>
+<div id="msgs"></div>
+<div id="wait-ind"></div>
+<div id="input-row">
+<textarea id="msg-input" rows="1" placeholder="escribe aquí..." onkeydown="keyEnter(event)"></textarea>
+<button id="btn-send" onclick="enviar()">↑</button>
+</div>
+</div>
 <!-- MENÚ PRINCIPAL ∆° -->
 <div class="overlay" id="menu-overlay" onclick="cerrarOverlay('menu-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="card-close-x"><span onclick="cerrarOverlay('menu-overlay')">✕</span></div>
-    <div class="card-header">∆° MENÚ</div>
-    <div class="card-item" onclick="verPerfil(U.nombre)">∆Perfil°</div>
-    <div class="card-item" onclick="abrirContactos()">∆Contactos° (<span id="menu-contactos-count">0</span>/70)</div>
-    <div class="card-item" onclick="editarCodigo('bitchat_id','tu código Bitchat')">∆BitChat°</div>
-    <div class="card-item" onclick="editarCodigo('briar_id','tu código Briar')">∆Briar°</div>
-    <div class="card-item" onclick="abrirRecordReferidos()">∆Record-Referidos°</div>
-    <div class="card-item" onclick="abrirNotificaciones()">∆Notificación°</div>
-    <div class="card-item" onclick="abrirEcosistema()">∆Ecosistema°</div>
-    <div class="card-item" onclick="abrirEditorColorBanner()">∆Banner-Color°</div>
-    <div class="card-item" id="menu-banner" style="display:none;color:#a855f7;" onclick="abrirEditorBanner()">∆Banner°</div>
-    <div class="card-item" id="menu-transmision" style="display:none;color:#a855f7;" onclick="abrirCentroMando()">∆Transmisión°</div>
-    <div class="card-item" id="menu-crear-link-mod" style="display:none;" onclick="crearLinkModerador()">🛡 Sumar moderador de apoyo</div>
-    <div class="card-item" onclick="document.getElementById('menu-temas').classList.toggle('on')">🎨 Cambiar tema</div>
-    <div id="menu-temas" class="theme-row" style="padding:10px 16px;">
-      <button class="th-btn th-matrix" onclick="setTema('matrix')">MATRIX</button>
-      <button class="th-btn th-carta"  onclick="setTema('carta')">CARTA</button>
-      <button class="th-btn th-papel"  onclick="setTema('papel')">PAPEL</button>
-      <button class="th-btn th-violeta" onclick="setTema('violeta')">VIOLETA</button>
-      <button class="th-btn th-notichat" onclick="setTema('notichat')">NOTICHAT</button>
-      <button class="th-btn th-cristiano" onclick="setTema('cristiano')">CRISTIANO</button>
-      <button class="th-btn th-gameboy" onclick="setTema('gameboy')">GAMEBOY</button>
-    </div>
-    <div class="card-item peligro" onclick="cerrarSesion()">⏻ Cerrar sesión</div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="card-close-x"><span onclick="cerrarOverlay('menu-overlay')">✕</span></div>
+<div class="card-header">∆° MENÚ</div>
+<div class="card-item" onclick="verPerfil(U.nombre)">∆Perfil°</div>
+<div class="card-item" onclick="abrirContactos()">∆Contactos° (<span id="menu-contactos-count">0</span>/70)</div>
+<div class="card-item" onclick="abrirSenaCromatica()">∆Seña-Cromática°</div>
+<div class="card-item" onclick="editarCodigo('bitchat_id','tu código Bitchat')">∆BitChat°</div>
+<div class="card-item" onclick="editarCodigo('briar_id','tu código Briar')">∆Briar°</div>
+<div class="card-item" onclick="abrirRecordReferidos()">∆Record-Referidos°</div>
+<div class="card-item" onclick="abrirNotificaciones()">∆Notificación°</div>
+<div class="card-item" onclick="abrirEcosistema()">∆Ecosistema°</div>
+<div class="card-item" onclick="abrirEditorColorBanner()">∆Banner-Color°</div>
+<div class="card-item" id="menu-banner" style="display:none;color:#a855f7;" onclick="abrirEditorBanner()">∆Banner°</div>
+<div class="card-item" id="menu-transmision" style="display:none;color:#a855f7;" onclick="abrirCentroMando()">∆Transmisión°</div>
+<div class="card-item" id="menu-crear-link-mod" style="display:none;" onclick="crearLinkModerador()">🛡️ Sumar moderador de apoyo</div>
+<div class="card-item" onclick="document.getElementById('menu-temas').classList.toggle('on')">🎨 Cambiar tema</div>
+<div id="menu-temas" class="theme-row" style="padding:10px 16px;">
+<button class="th-btn th-matrix" onclick="setTema('matrix')">MATRIX</button>
+<button class="th-btn th-carta" onclick="setTema('carta')">CARTA</button>
+<button class="th-btn th-papel" onclick="setTema('papel')">PAPEL</button>
+<button class="th-btn th-violeta" onclick="setTema('violeta')">VIOLETA</button>
+<button class="th-btn th-notichat" onclick="setTema('notichat')">NOTICHAT</button>
+<button class="th-btn th-cristiano" onclick="setTema('cristiano')">CRISTIANO</button>
+<button class="th-btn th-gameboy" onclick="setTema('gameboy')">GAMEBOY</button>
 </div>
-
+<div class="card-item peligro" onclick="cerrarSesion()">🚪 Cerrar sesión</div>
+</div>
+</div>
 <!-- ∆Banner°: TOCAR EL TEXTO → "Tema del Día", protagonista el texto, imagen en miniatura -->
 <div class="overlay" id="banner-lectura-overlay" onclick="cerrarOverlay('banner-lectura-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="card-close-x"><span onclick="cerrarOverlay('banner-lectura-overlay')">✕</span></div>
-    <div class="banner-lectura" id="banner-lectura-content"></div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="card-close-x"><span onclick="cerrarOverlay('banner-lectura-overlay')">✕</span></div>
+<div class="banner-lectura" id="banner-lectura-content"></div>
 </div>
-
+</div>
 <!-- ∆Banner°: TOCAR LA MINIATURA → "Imagen de Apoyo", protagonista la imagen (fija), texto con scroll propio -->
 <div class="overlay" id="banner-imagen-overlay" onclick="cerrarOverlay('banner-imagen-overlay')">
-  <div class="card banner-imagen-card" onclick="event.stopPropagation()">
-    <div class="card-close-x"><span onclick="cerrarOverlay('banner-imagen-overlay')">✕</span></div>
-    <img id="banner-imagen-grande" class="banner-imagen-fija">
-    <div class="banner-texto-scroll" id="banner-imagen-texto"></div>
-  </div>
+<div class="card banner-imagen-card" onclick="event.stopPropagation()">
+<div class="card-close-x"><span onclick="cerrarOverlay('banner-imagen-overlay')">✕</span></div>
+<img id="banner-imagen-grande" class="banner-imagen-fija">
+<div class="banner-texto-scroll" id="banner-imagen-texto"></div>
 </div>
-
+</div>
 <!-- BANNER: editor completo (solo CEO — texto + ambos colores) -->
 <div class="overlay" id="banner-editor-overlay" onclick="cerrarOverlay('banner-editor-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="card-close-x"><span onclick="cerrarOverlay('banner-editor-overlay')">✕</span></div>
-    <div class="card-header" style="color:#a855f7;">∆Banner° — tema del día</div>
-    <div class="banner-form">
-      <textarea class="inp" id="banner-texto-input" rows="4" maxlength="777" placeholder="Pregunta o tema a tratar (máx 777 caracteres)"></textarea>
-      <div class="char-count"><span id="banner-char-count">0</span>/777</div>
-
-      <div class="swatch-label">COLOR DE LAS LETRAS (el texto en movimiento):</div>
-      <div class="color-swatches" id="swatches-texto"></div>
-
-      <div class="swatch-label">COLOR DEL CUADRO Y LOS PUNTOS:</div>
-      <div class="color-swatches" id="swatches-caja"></div>
-
-      <div class="swatch-label">TAMAÑO DE LA LETRA:</div>
-      <div class="color-swatches" id="opciones-tamano"></div>
-
-      <div class="swatch-label">VELOCIDAD DEL DESPLAZAMIENTO:</div>
-      <div class="color-swatches" id="opciones-velocidad"></div>
-
-      <label class="btn secundario" style="cursor:pointer;">Cargar imagen de apoyo (cuadrada)<input type="file" id="banner-img-apoyo-input" accept="image/*" style="display:none;" onchange="previsualizarBannerApoyo()"></label>
-      <img id="banner-apoyo-preview" style="max-width:120px;border-radius:6px;display:none;">
-      <button class="btn" onclick="guardarBanner()">Publicar en el banner</button>
-    </div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="card-close-x"><span onclick="cerrarOverlay('banner-editor-overlay')">✕</span></div>
+<div class="card-header" style="color:#a855f7;">∆Banner° — tema del día</div>
+<div class="banner-form">
+<textarea class="inp" id="banner-texto-input" rows="4" maxlength="777" placeholder="Pregunta o tema a tratar (máx 777 caracteres)"></textarea>
+<div class="char-count"><span id="banner-char-count">0</span>/777</div>
+<div class="swatch-label">COLOR DE LAS LETRAS (el texto en movimiento):</div>
+<div class="color-swatches" id="swatches-texto"></div>
+<div class="swatch-label">COLOR DEL CUADRO Y LOS PUNTOS:</div>
+<div class="color-swatches" id="swatches-caja"></div>
+<div class="swatch-label">TAMAÑO DE LA LETRA:</div>
+<div class="color-swatches" id="opciones-tamano"></div>
+<div class="swatch-label">VELOCIDAD DEL DESPLAZAMIENTO:</div>
+<div class="color-swatches" id="opciones-velocidad"></div>
+<label class="btn secundario" style="cursor:pointer;">Cargar imagen de apoyo (cuadrada)<input type="file" id="banner-img-apoyo-input" accept="image/*" style="display:none;" onchange="previsualizarBannerApoyo()"></label>
+<img id="banner-apoyo-preview" style="max-width:120px;border-radius:6px;display:none;">
+<button class="btn" onclick="guardarBanner()">Publicar en el banner</button>
 </div>
-
+</div>
+</div>
 <!-- ∆Banner-Color°: cualquier usuario puede personalizar SOLO los colores que ve (no el texto) -->
 <div class="overlay" id="banner-color-overlay" onclick="cerrarOverlay('banner-color-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="card-close-x"><span onclick="cerrarOverlay('banner-color-overlay')">✕</span></div>
-    <div class="card-header">∆Banner-Color°</div>
-    <div class="banner-form">
-      <div style="font-size:11px;opacity:.7;line-height:1.6;">Esto solo cambia cómo TÚ ves los colores del banner en tu propio dispositivo. El texto lo sigue publicando el C.E.O.</div>
-      <div class="swatch-label">COLOR DE LAS LETRAS:</div>
-      <div class="color-swatches" id="swatches-texto-user"></div>
-      <div class="swatch-label">COLOR DEL CUADRO Y LOS PUNTOS:</div>
-      <div class="color-swatches" id="swatches-caja-user"></div>
-      <button class="btn" onclick="guardarColorPersonalBanner()">Aplicar a mi banner</button>
-      <button class="btn secundario" onclick="restablecerColorBanner()">Usar el color original del C.E.O.</button>
-    </div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="card-close-x"><span onclick="cerrarOverlay('banner-color-overlay')">✕</span></div>
+<div class="card-header">∆Banner-Color°</div>
+<div class="banner-form">
+<div style="font-size:11px;opacity:.7;line-height:1.6;">Esto solo cambia cómo TÚ ves los colores del banner en tu propio dispositivo. El texto lo sigue publicando el C.E.O.</div>
+<div class="swatch-label">COLOR DE LAS LETRAS:</div>
+<div class="color-swatches" id="swatches-texto-user"></div>
+<div class="swatch-label">COLOR DEL CUADRO Y LOS PUNTOS:</div>
+<div class="color-swatches" id="swatches-caja-user"></div>
+<button class="btn" onclick="guardarColorPersonalBanner()">Aplicar a mi banner</button>
+<button class="btn secundario" onclick="restablecerColorBanner()">Usar el color original del C.E.O.</button>
 </div>
-
+</div>
+</div>
 <!-- MENÚ AL TOCAR NOMBRE/FOTO DE OTRO USUARIO (solo lectura + amistad + moderación si aplica) -->
 <div class="overlay" id="user-menu-overlay" onclick="cerrarOverlay('user-menu-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="card-header" id="um-header">USUARIO</div>
-    <div class="card-item" onclick="verPerfil(UM.objetivo)">👤 Ver perfil</div>
-    <div class="card-item" onclick="enviarSolicitudAmistad(UM.objetivo)">➕ Solicitar agregar a mis 70 contactos</div>
-    <div class="card-item" onclick="abrirDM(UM.objetivo)">✉ Enviar mensaje</div>
-    <div id="um-mod-tools"></div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="card-header" id="um-header">USUARIO</div>
+<div class="card-item" onclick="verPerfil(UM.objetivo)">👤 Ver perfil</div>
+<div class="card-item" onclick="enviarSolicitudAmistad(UM.objetivo)">➕ Solicitar agregar a mis 70 contactos</div>
+<div class="card-item" onclick="abrirDM(UM.objetivo)">✉ Enviar mensaje</div>
+<div id="um-mod-tools"></div>
 </div>
-
+</div>
 <!-- PERFIL -->
 <div class="overlay" id="perfil-overlay" onclick="cerrarOverlay('perfil-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="profile-view" id="perfil-content">Cargando...</div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="profile-view" id="perfil-content">Cargando...</div>
 </div>
-
+</div>
 <!-- CONTACTOS -->
 <div class="overlay" id="contactos-overlay" onclick="cerrarOverlay('contactos-overlay')">
-  <div class="card" onclick="event.stopPropagation()" id="contactos-content"></div>
+<div class="card" onclick="event.stopPropagation()" id="contactos-content"></div>
 </div>
-
 <!-- RECORD DE REFERIDOS -->
 <div class="overlay" id="referidos-overlay" onclick="cerrarOverlay('referidos-overlay')">
-  <div class="card" onclick="event.stopPropagation()" id="referidos-content"></div>
+<div class="card" onclick="event.stopPropagation()" id="referidos-content"></div>
 </div>
-
 <!-- NOTIFICACIONES -->
 <div class="overlay" id="notif-overlay" onclick="cerrarOverlay('notif-overlay')">
-  <div class="card" onclick="event.stopPropagation()" id="notif-content"></div>
+<div class="card" onclick="event.stopPropagation()" id="notif-content"></div>
 </div>
-
 <!-- ECOSISTEMA -->
 <div class="overlay" id="eco-overlay" onclick="cerrarOverlay('eco-overlay')">
-  <div class="card" onclick="event.stopPropagation()" id="eco-content"></div>
+<div class="card" onclick="event.stopPropagation()" id="eco-content"></div>
 </div>
-
 <!-- DM -->
 <div class="overlay" id="dm-overlay" onclick="cerrarOverlay('dm-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="card-header" id="dm-header">MENSAJE</div>
-    <div id="dm-msgs"></div>
-    <div id="dm-input-row">
-      <input id="dm-input" placeholder="escribe..." onkeydown="if(event.key==='Enter')enviarDM()">
-      <button class="btn" style="width:auto;padding:8px 12px;" onclick="enviarDM()">➤</button>
-    </div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="card-header" id="dm-header">MENSAJE</div>
+<div id="dm-msgs"></div>
+<div id="dm-input-row">
+<input id="dm-input" placeholder="escribe..." onkeydown="if(event.key==='Enter')enviarDM()">
+<button class="btn" style="width:auto;padding:8px 12px;" onclick="enviarDM()">➤</button>
 </div>
-
+</div>
+</div>
 <!-- CENTRO DE MANDO / ∆Transmisión° -->
 <div class="overlay" id="centro-mando-overlay" onclick="cerrarOverlay('centro-mando-overlay')">
-  <div class="card" onclick="event.stopPropagation()">
-    <div class="card-header" style="color:#a855f7;">∆Transmisión° — CENTRO DE MANDO</div>
-    <div class="live-btn-grid">
-      <div class="live-btn" onclick="iniciarLive('camara')">📹<br>Cámara</div>
-      <div class="live-btn" onclick="iniciarLive('pantalla')">🖥<br>Compartir pantalla</div>
-      <div class="live-btn" onclick="iniciarLive('audio')">🎙<br>Solo audio</div>
-      <div class="live-btn" onclick="cerrarOverlay('centro-mando-overlay')">✕<br>Cerrar</div>
-    </div>
-    <div class="live-finalizar" onclick="finalizarLive()">■ FINALIZAR TRANSMISIÓN</div>
-  </div>
+<div class="card" onclick="event.stopPropagation()">
+<div class="card-header" style="color:#a855f7;">∆Transmisión° — CENTRO DE MANDO</div>
+<div class="live-btn-grid">
+<div class="live-btn" onclick="iniciarLive('camara')">📷<br>Cámara</div>
+<div class="live-btn" onclick="iniciarLive('pantalla')">🖥️<br>Compartir pantalla</div>
+<div class="live-btn" onclick="iniciarLive('audio')">🎙️<br>Solo audio</div>
+<div class="live-btn" onclick="cerrarOverlay('centro-mando-overlay')">✕<br>Cerrar</div>
 </div>
-
+<div class="live-finalizar" onclick="finalizarLive()">⏹ FINALIZAR TRANSMISIÓN</div>
+</div>
+</div>
 <!-- PANTALLA DEL DIRECTO -->
 <div id="live-view">
-  <button id="live-cerrar" onclick="salirDeLive()">✕</button>
-  <div id="live-estado-diag" style="display:none;position:absolute;top:14px;left:14px;right:60px;z-index:10;background:rgba(0,0,0,.75);color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;text-align:center;"></div>
-  <div id="live-video-wrap">
-    <div class="live-logo-esquina" id="live-logo-esquina" style="display:none;">∆°</div>
-    <div class="live-logo-centro" id="live-logo-centro" style="display:none;">∆°</div>
-  </div>
-  <div id="live-chat-panel">
-    <div id="live-chat-msgs"></div>
-    <div id="live-chat-input-row">
-      <input id="live-chat-input" placeholder="escribe en el directo..." onkeydown="if(event.key==='Enter')enviarLiveChat()">
-      <button class="btn" style="width:auto;padding:8px 12px;" onclick="enviarLiveChat()">➤</button>
-    </div>
-  </div>
+<button id="live-cerrar" onclick="salirDeLive()">✕</button>
+<div id="live-estado-diag" style="display:none;position:absolute;top:14px;left:14px;right:60px;z-index:10;background:rgba(0,0,0,.75);color:#fff;padding:8px 10px;border-radius:6px;font-size:12px;"></div>
+<div id="live-video-wrap">
+<div class="live-logo-esquina" id="live-logo-esquina" style="display:none;">∆°</div>
+<div class="live-logo-centro" id="live-logo-centro" style="display:none;">∆°</div>
 </div>
-
-
+<div id="live-chat-panel">
+<div id="live-chat-msgs"></div>
+<div id="live-chat-input-row">
+<input id="live-chat-input" placeholder="escribe en el directo..." onkeydown="if(event.key==='Enter')enviarLiveChat()">
+<button class="btn" style="width:auto;padding:8px 12px;" onclick="enviarLiveChat()">➤</button>
+</div>
+</div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
 <script src="js/utilidades.js"></script>
@@ -283,7 +253,6 @@
 <script src="js/menu-banner.js"></script>
 <script src="js/perfil-social.js"></script>
 <script src="js/notificaciones-dm.js"></script>
-<script src="js/ecosistema-moderacion.js"></script>
 <script src="js/live.js"></script>
 </body>
 </html>
